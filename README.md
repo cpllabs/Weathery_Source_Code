@@ -6,7 +6,7 @@
 </center>
 
 ## About
-Weathery is a ***Weather Application*** for **Android** build entirely on **Flutter** using **WeatherAPI**.
+Weathery is a ***Weather Application*** for **Android** built entirely on **Flutter** using **WeatherAPI**.
 
 ## Getting Started
 
