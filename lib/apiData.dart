@@ -294,7 +294,7 @@ setForecast(List<dynamic> forecastList) {
   int currentHour = DateTime.now().hour;
   List mainData = forecastList[0]["hour"];
   mainData.addAll(forecastList[1]["hour"]);
-  for (int i = currentHour + 1; i < currentHour + 25; i++) {
+  for (int i = currentHour + 1; i <= currentHour + 24; i++) {
     forecastsWidgetList.add(ForecastDisplayObject(mainData[i]));
     forecastsWidgetList.add(
       VerticalDivider(
@@ -310,13 +310,16 @@ setForecast(List<dynamic> forecastList) {
 
 @pragma('vm:entry-point')
 Future<List> BackGroundWeather() async {
+  /*
+  Output Format : Array<temp,info of rain or snow, current condition, icon, no. of alerts>
+   */
   var out = [];
   var locObj = Location();
   await locObj.initPrefObj();
   var positionCord = locObj.getLastKnowLocation();
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$positionCord&aqi=yes&alerts=yes&days=2');
+      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$positionCord&alerts=yes&days=1');
   var response;
   try {
     response = await http.get(url);
@@ -328,7 +331,8 @@ Future<List> BackGroundWeather() async {
   } on FormatException catch (e) {
     return [];
   }
-  out.add(body["current"]["temp_c"].toString());
+  out.add(analyzeTemperature(body));
+  out.add(analyzeWeather(body));
   out.add(body["current"]["condition"]["text"]);
   out.add(body["current"]["condition"]["icon"].toString().substring(21));
   out.add(body['alerts']['alert'].length);
@@ -340,12 +344,12 @@ Future<void> MorningMessage() async {
   var obj = NotificationSettings();
   await obj.initPrefObj();
   if (obj.getMorningSavedStatus()) {
-    List weatherInfo = await BackGroundWeather(); //temp,desc,icon,no. of alerts
+    List weatherInfo = await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
     var message = await getMorningNotificationValues();
-    String dispMessage = message[1] +
-        "\nTemprature : ${weatherInfo[0]}\nDescription : ${weatherInfo[1]}\nActive Alerts : ${weatherInfo[3]} Alerts";
+    String dispMessage = message[1] + ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
+        "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
     NotificationManger()
-        .showMorningNotification(message[0], dispMessage, weatherInfo[2]);
+        .showMorningNotification(message[0], dispMessage, weatherInfo[3]);
   }
 }
 
@@ -354,12 +358,12 @@ Future NoonMessage() async {
   var obj = NotificationSettings();
   await obj.initPrefObj();
   if (obj.getNoonSavedStatus()) {
-  List weatherInfo = await BackGroundWeather(); //temp,desc,icon,no. of alerts
+  List weatherInfo = await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
   var message = await getNoonNotificationValues();
-  String dispMessage = message[1] +
-      "\nTemprature : ${weatherInfo[0]}\nDescription : ${weatherInfo[1]}\nActive Alerts : ${weatherInfo[3]} Alerts";
+  String dispMessage = message[1] + ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
+      "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
   NotificationManger()
-      .showNoonNotification(message[0], dispMessage, weatherInfo[2]);
+      .showNoonNotification(message[0], dispMessage, weatherInfo[3]);
 }}
 
 @pragma('vm:entry-point')
@@ -368,11 +372,11 @@ Future NightMessage() async {
   await obj.initPrefObj();
 
   if (obj.getNightSavedStatus()) {
-    List weatherInfo = await BackGroundWeather(); //temp,desc,icon,no. of alerts
+    List weatherInfo = await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
     var message = await getNightNotificationValues();
-    String dispMessage = message[1] +
-        "\nTemprature : ${weatherInfo[0]}\nDescription : ${weatherInfo[1]}\nActive Alerts : ${weatherInfo[3]} Alerts";
+    String dispMessage = message[1] + ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
+        "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
     NotificationManger()
-        .showNightNotification(message[0], dispMessage, weatherInfo[2]);
+        .showNightNotification(message[0], dispMessage, weatherInfo[3]);
   }
 }
