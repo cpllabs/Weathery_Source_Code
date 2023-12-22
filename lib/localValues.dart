@@ -177,3 +177,33 @@ class NotificationSettings {
         : prefObj.getBool('NightNotifyStatus'));
   }
 }
+
+
+String analyzeWeather(Map<String, dynamic> body){
+  String out = "";
+  List<List<int>> multiPurposeDescVar =[[],[]];
+  int currentHour = DateTime.now().hour;
+  for(int i = currentHour; i <= currentHour+3; i++){
+    multiPurposeDescVar[0].add(body["forecast"]['forecastday'][0]["hour"][i]["will_it_rain"]);
+  }
+  bool multi = false;
+  if (multiPurposeDescVar[0].contains(1)){
+    out = "Possibilities of Rain";
+    multi = true;
+  }
+  if (multiPurposeDescVar[1].contains(1)){
+    out += (multi) ? ", Snowfall": "Possibilities of Snowfall";
+    multi = true;
+  }
+  return out;
+}
+
+
+String analyzeTemperature(Map<String, dynamic> body){
+  List<double> multiPurposeDescVar =[];
+  int currentHour = DateTime.now().hour;
+  for(int i = currentHour; i <= currentHour+3; i++){
+    multiPurposeDescVar.add(body["forecast"]['forecastday'][0]["hour"][i]["temp_c"]);
+  }
+  return "Ranging From ${multiPurposeDescVar.reduce(min)}°C To ${multiPurposeDescVar.reduce(max)}°C";
+}

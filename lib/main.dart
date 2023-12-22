@@ -20,13 +20,15 @@ void main() async {
   await AndroidAlarmManager.cancel(0);
   await AndroidAlarmManager.cancel(1);
   await AndroidAlarmManager.cancel(2);
+
   await AndroidAlarmManager.periodic(
     const Duration(days: 1),
     0,
     MorningAlertFunction,
     allowWhileIdle: true,
     startAt:
-        calculateDurationFromSpecificTime(const TimeOfDay(hour: 6, minute: 30)),
+        calculateDurationFromSpecificTime(
+            const TimeOfDay(hour: 6, minute: 30)),
     exact: true,
     rescheduleOnReboot: true,
     wakeup: true,
@@ -63,7 +65,8 @@ void main() async {
     route = "/normal";
   }
 
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
   runApp(MainApp(firstRoute: route));
 }
 
@@ -74,7 +77,6 @@ class MainApp extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       theme: mainTheme,
       navigatorKey: globalNavigatorKey,
@@ -93,7 +95,6 @@ class MainApp extends StatelessWidget {
     );
   }
 }
-
 
 @pragma('vm:entry-point')
 calculateDurationFromSpecificTime(TimeOfDay specificTime) {

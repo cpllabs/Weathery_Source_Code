@@ -77,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         height: 2.5,
                       ),
                       Text(
-                        "Triggered at 6:30 AM Daily",
+                        "Triggered at 06:30 AM Daily",
                         style: captionStyle.copyWith(fontSize: 17),
                       ),
                     ],
@@ -147,7 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         height: 2.5,
                       ),
                       Text(
-                        "Triggered at 8:00 PM Daily",
+                        "Triggered at 08:00 PM Daily",
                         style: captionStyle.copyWith(fontSize: 17),
                       ),
                     ],
