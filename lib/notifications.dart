@@ -20,7 +20,10 @@ class NotificationManger {
         message,
         NotificationDetails(
             android: AndroidNotificationDetails("0", "Morning Update Channel",
-                priority: Priority.max, importance: Importance.max, styleInformation: BigTextStyleInformation(message, contentTitle: heading))));
+                priority: Priority.max,
+                importance: Importance.max,
+                styleInformation:
+                    BigTextStyleInformation(message, contentTitle: heading))));
   }
 
   @pragma('vm:entry-point')
@@ -32,7 +35,10 @@ class NotificationManger {
         message,
         NotificationDetails(
             android: AndroidNotificationDetails("1", "Afternoon Update Channel",
-                priority: Priority.max, importance: Importance.max, styleInformation: BigTextStyleInformation(message, contentTitle: heading))));
+                priority: Priority.max,
+                importance: Importance.max,
+                styleInformation:
+                    BigTextStyleInformation(message, contentTitle: heading))));
   }
 
   @pragma('vm:entry-point')
@@ -44,6 +50,9 @@ class NotificationManger {
         message,
         NotificationDetails(
             android: AndroidNotificationDetails("2", "Night Update Channel",
-                priority: Priority.max, importance: Importance.max, styleInformation: BigTextStyleInformation(message, contentTitle: heading))));
+                priority: Priority.max,
+                importance: Importance.max,
+                styleInformation:
+                    BigTextStyleInformation(message, contentTitle: heading))));
   }
 }

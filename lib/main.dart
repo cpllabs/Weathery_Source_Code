@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:weathery/about.dart';
 import 'package:weathery/apiData.dart';
 import 'package:weathery/mainScreen.dart';
+import 'package:weathery/semiWidgets.dart';
 import 'package:weathery/settings.dart';
 import 'themeData.dart';
 import 'package:flutter/material.dart';
@@ -27,8 +28,7 @@ void main() async {
     MorningAlertFunction,
     allowWhileIdle: true,
     startAt:
-        calculateDurationFromSpecificTime(
-            const TimeOfDay(hour: 6, minute: 30)),
+        calculateDurationFromSpecificTime(const TimeOfDay(hour: 6, minute: 30)),
     exact: true,
     rescheduleOnReboot: true,
     wakeup: true,

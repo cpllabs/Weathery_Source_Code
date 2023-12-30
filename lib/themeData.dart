@@ -5,7 +5,7 @@ Color primaryForegroundColor = const Color(0xFF1D1E33);
 Color secondaryForegroundColor = const Color(0xFF111328);
 Color primaryTextColor = Colors.white;
 Color secondaryTextColor = const Color(0xFF8D8E98);
-Color buttonColor =  const Color(0xFFEB1555);
+Color buttonColor = const Color(0xFFEB1555);
 
 ThemeData mainTheme = ThemeData(
   fontFamily: "PT Sans",
@@ -19,9 +19,9 @@ TextStyle headingStyle = const TextStyle(
   color: Colors.white,
   fontWeight: FontWeight.w600,
   fontSize: 35,
-  );
+);
 
-TextStyle captionStyle =  TextStyle(
+TextStyle captionStyle = TextStyle(
   color: secondaryTextColor,
   fontWeight: FontWeight.w400,
   fontSize: 20,

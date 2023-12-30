@@ -1,4 +1,11 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import "package:flutter/material.dart";
+import 'package:flutter/rendering.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ironsource_mediation/ironsource_mediation.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:weathery/apiData.dart';
 import 'package:weathery/semiWidgets.dart';
 import 'themeData.dart';
@@ -17,25 +24,29 @@ String userCountry = '',
     AQIDesc = "",
     bgimage = '',
     posLat = '',
-    posLong = '';
+    posLong = '',
+    rainInfo = '';
 List<Widget> alerts = [], forecastsWidgetList = [];
 
 class MainScreen extends StatefulWidget {
   var userNameObjPassed;
   MainScreen({Key? key, userNameObj}) : super(key: key) {
     userNameObjPassed = userNameObj;
+    IronSource.hideBanner();
   }
   @override
   State<MainScreen> createState() =>
       _MainScreenState(username: userNameObjPassed);
 }
 
-void setWeatherData({temp, desc, feels, iconPathWithoutAPI, pressure}) {
+void setWeatherData(
+    {temp, desc, feels, iconPathWithoutAPI, pressure, rainData}) {
   tempCurrent = temp;
   descCurrent = desc;
   feelsLike = feels;
   icon = iconPathWithoutAPI;
   pressureC = pressure;
+  rainInfo = rainData;
 }
 
 void setAQI({usepa, desc}) {
@@ -52,6 +63,34 @@ final greeting = Greetings().getMessage();
 String name = "";
 
 class _MainScreenState extends State<MainScreen> {
+  GlobalKey _globalKey = GlobalKey();
+  bool isVisible = false;
+
+  Future<void> captureAndSaveImage() async {
+    try {
+      RenderRepaintBoundary boundary = _globalKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+      Share.shareXFiles(
+        [
+          XFile.fromData(pngBytes,
+              mimeType: "image/png",
+              name: "WeatherDetails_${DateTime.now()}.png")
+        ],
+        text: getShareMessage(userCity, userCountry),
+      );
+    } catch (e) {
+      print('Error capturing and saving image: $e');
+    } finally {
+      setState(() {
+        isVisible = false;
+      });
+    }
+  }
+
   var usernameObj;
   _MainScreenState({username}) {
     usernameObj = username;
@@ -59,8 +98,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     name = usernameObj.getName();
+    precacheImage(const AssetImage('assets/weathery_icon.png'), context);
     return Scaffold(
-      drawer: SideNavBar(),
+      drawer: const SideNavBar(),
       appBar: AppBar(
         elevation: 25,
         actions: [
@@ -86,6 +126,7 @@ class _MainScreenState extends State<MainScreen> {
               padding: EdgeInsets.zero,
               focusColor: primaryBackgroundColor,
               onPressed: () {
+                IronSource.displayBanner();
                 getCurrentLocation();
                 alertUser(
                     title: const SizedBox(
@@ -171,6 +212,7 @@ class _MainScreenState extends State<MainScreen> {
                                       padding: EdgeInsets.zero,
                                       splashColor: secondaryForegroundColor,
                                       onPressed: () {
+                                        IronSource.displayBanner();
                                         getWeatherFromName(
                                             city: "$posLat,$posLong");
                                         alertUser(
@@ -197,6 +239,32 @@ class _MainScreenState extends State<MainScreen> {
                                       },
                                       child: const Icon(
                                         Icons.refresh,
+                                        size: 35,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: SizedBox(
+                                  width: 30,
+                                  child: Center(
+                                    child: MaterialButton(
+                                      padding: EdgeInsets.zero,
+                                      splashColor: secondaryForegroundColor,
+                                      onPressed: () {
+                                        setState(() {
+                                          isVisible = true;
+                                        });
+
+                                        // Delay execution after state update and re-render:
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((_) {
+                                          captureAndSaveImage();
+                                        });
+                                      },
+                                      child: const Icon(
+                                        Icons.share,
                                         size: 35,
                                       ),
                                     ),
@@ -418,42 +486,192 @@ class _MainScreenState extends State<MainScreen> {
                             ],
                           )),
                       Container(
-                          //Alerts
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
-                            color: primaryForegroundColor,
-                          ),
-                          margin: const EdgeInsets.only(top: 15, bottom: 12.5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                "Alerts",
-                                style: headingStyle.copyWith(fontSize: 26),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Column(
-                                children: alerts,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
+                        //Alerts
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          color: primaryForegroundColor,
+                        ),
+                        margin: const EdgeInsets.only(top: 15, bottom: 12.5),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Alerts",
+                              style: headingStyle.copyWith(fontSize: 26),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Column(
+                              children: alerts,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
+              Offstage(
+                offstage: !isVisible,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 25, 15, 25),
+                  child: RepaintBoundary(
+                    key: _globalKey,
+                    child: Container(
+                      height:
+                          355, // Share Image Container //TODO : SS CONTAINER
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: primaryBackgroundColor),
+                      padding: const EdgeInsets.all(12.5),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: primaryForegroundColor),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.location_on_sharp,
+                                      size: 30, color: secondaryTextColor),
+                                  Container(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "$userCity\n$userCountry",
+                                    style: captionStyle.copyWith(fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                height: 22,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          textBaseline: TextBaseline.alphabetic,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.baseline,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              tempCurrent,
+                                              style: headingStyle.copyWith(
+                                                fontSize: 50,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              "°C",
+                                              style: headingStyle.copyWith(
+                                                  fontSize: 20),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          descCurrent,
+                                          style: captionStyle.copyWith(
+                                              fontSize: 19),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        SizedBox(
+                                          width: 200,
+                                          child: Text(
+                                            rainInfo.isNotEmpty
+                                                ? rainInfo
+                                                : "No Rain or Snowfall",
+                                            style: headingStyle.copyWith(
+                                              height: 1.05,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Active Alerts in Area : ${alerts[0].runtimeType == WeatherAlertDisplayObject ? alerts.length : 0}",
+                                          style: headingStyle.copyWith(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w300),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Image.asset(
+                                      "assets/$icon",
+                                      scale: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 22,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text("Powered By"),
+                                      Text(
+                                        "Weathery",
+                                        style:
+                                            headingStyle.copyWith(fontSize: 20),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Image.asset(
+                                    "assets/weathery_icon.png",
+                                    scale: 10,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
@@ -466,19 +684,9 @@ void setLocationData({city, country, isday}) {
   userCountry = country;
   userCity = city;
   int val = DateTime.now().hour;
-  if (isday ==1 ) {
+  if (isday == 1) {
     bgimage = "day";
   } else {
     bgimage = "night";
-  }
-}
-
-
-class _MyAppStateCheckerState extends State<MainScreen> with WidgetsBindingObserver {
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(); // Replace this with your main widget.
   }
 }

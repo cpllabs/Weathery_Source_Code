@@ -16,7 +16,7 @@ class firstStartUp extends StatelessWidget {
         child: Container(
           width: 300,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
             color: primaryForegroundColor,
           ),
           child: Column(
@@ -50,16 +50,18 @@ class firstStartUp extends StatelessWidget {
                     minWidth: 260,
                     maxWidth: 260,
                   ),
-                  contentPadding: EdgeInsets.all(7.5),
+                  contentPadding: const EdgeInsets.all(7.5),
                   enabledBorder: OutlineInputBorder(
                       borderSide:
                           BorderSide(color: primaryForegroundColor, width: 1),
-                      borderRadius: BorderRadius.all(Radius.circular(50))),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(50))),
                   focusedBorder: OutlineInputBorder(
                       borderSide:
                           BorderSide(color: secondaryForegroundColor, width: 3),
-                      borderRadius: BorderRadius.all(Radius.circular(50))),
-                  prefixIcon: Icon(Icons.person),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(50))),
+                  prefixIcon: const Icon(Icons.person),
                   prefixIconColor: MaterialStateColor.resolveWith(
                       (Set<MaterialState> states) {
                     if (states.contains(MaterialState.focused)) {
@@ -68,7 +70,7 @@ class firstStartUp extends StatelessWidget {
                     return Colors.grey;
                   }),
                   hintStyle: captionStyle.copyWith(
-                      fontSize: 18, color: Color(0xff6f7076)),
+                      fontSize: 18, color: const Color(0xff6f7076)),
                   hintText: "Enter Name",
                 ),
                 style: captionStyle.copyWith(fontSize: 18, color: Colors.white),
@@ -107,10 +109,10 @@ class firstStartUp extends StatelessWidget {
                           fontSize: 16.0);
                     }
                   },
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
+                    children: [
                       SizedBox(width: 10),
                       Text("Continue"),
                       SizedBox(width: 10),

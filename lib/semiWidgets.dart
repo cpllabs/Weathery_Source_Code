@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:ironsource_mediation/ironsource_mediation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:weathery/apiData.dart';
@@ -16,6 +17,7 @@ void alertUser(
     required Widget content,
     required List<Widget> actions}) {
   showDialog(
+    barrierDismissible: false,
     context: globalNavigatorKey.currentContext!,
     builder: (BuildContext _) {
       return AlertDialog(
@@ -121,6 +123,7 @@ class SearchBar extends StatefulWidget {
 class _SearchBarState extends State<SearchBar> {
   TextEditingController searchController = TextEditingController();
   List<Widget> suggestions = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -238,6 +241,7 @@ class SearchSuggestionObject extends StatelessWidget {
       onPressed: () {
         closeSearchOverlay();
         getWeatherFromName(city: "$locationCity,$country_region");
+        IronSource.displayBanner();
         alertUser(
             title: const SizedBox(
               height: 0,
@@ -281,6 +285,7 @@ class SearchSuggestionObject extends StatelessWidget {
 
 OverlayEntry? entry;
 void showSearchOverlay(BuildContext context) {
+  IronSource.displayBanner();
   currentSearchBarContext = context;
   entry = OverlayEntry(
     builder: (context) => const SearchBar(),
@@ -290,10 +295,18 @@ void showSearchOverlay(BuildContext context) {
 }
 
 void closeSearchOverlay() {
+  IronSource.hideBanner();
   entry!.remove();
 }
 
-class SideNavBar extends StatelessWidget {
+class SideNavBar extends StatefulWidget {
+  const SideNavBar({Key? key}) : super(key: key);
+
+  @override
+  _SideNavBarState createState() => _SideNavBarState();
+}
+
+class _SideNavBarState extends State<SideNavBar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -337,19 +350,20 @@ class SideNavBar extends StatelessWidget {
               Navigator.pushReplacementNamed(
                   globalNavigatorKey.currentContext!, "/about");
             }),
-
             NavBarItem(Icons.settings, "Settings", () {
               Navigator.pushReplacementNamed(
                   globalNavigatorKey.currentContext!, "/settings");
             }),
-
             NavBarItem(Icons.privacy_tip_sharp, "Privacy Policy", () {
               launchUrlString(
                   "https://aryanshdev.github.io/Weathery/privacy.html",
                   mode: LaunchMode.externalApplication);
             }),
             const SizedBox(
-              height: 5,
+              height: 10,
+            ),
+            Container(
+              height: 50, // Adjust ad container height as needed
             ),
           ],
         ),
@@ -374,7 +388,10 @@ class NavBarItem extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       elevation: 5,
       splashColor: primaryBackgroundColor,
-      onPressed: onpress,
+      onPressed: () {
+        IronSource.hideBanner();
+        onpress!();
+      },
       child: Row(
         children: [
           Expanded(
@@ -398,12 +415,13 @@ class NavBarItem extends StatelessWidget {
 }
 
 class ForecastDisplayObject extends StatelessWidget {
-  var temp,time,icon,desc;
-  ForecastDisplayObject(@required dataObjct){
+  var temp, time, icon, desc;
+  ForecastDisplayObject(@required dataObjct) {
     desc = dataObjct["condition"]["text"];
-    icon= dataObjct["condition"]["icon"].toString().substring(21);
-    temp =  dataObjct["temp_c"];
-    time = DateFormat("h:mm a\nd MMM").format(DateTime.fromMillisecondsSinceEpoch(dataObjct["time_epoch"]*1000));
+    icon = dataObjct["condition"]["icon"].toString().substring(21);
+    temp = dataObjct["temp_c"];
+    time = DateFormat("h:mm a\nd MMM").format(
+        DateTime.fromMillisecondsSinceEpoch(dataObjct["time_epoch"] * 1000));
   }
 
   @override
@@ -412,10 +430,17 @@ class ForecastDisplayObject extends StatelessWidget {
       width: 75,
       child: Column(
         children: [
-          Text(time ,textAlign: TextAlign.center,),
+          Text(
+            time,
+            textAlign: TextAlign.center,
+          ),
           Image.asset('assets/$icon'),
           Text('$temp °C'),
-          Text(desc, style: captionStyle.copyWith(fontSize: 10), textAlign: TextAlign.center,),
+          Text(
+            desc,
+            style: captionStyle.copyWith(fontSize: 10),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -449,7 +474,7 @@ class WeatherAlertDisplayObject extends StatelessWidget {
             height: 7.5,
           ),
           Text(
-              body,
+            body,
             style: captionStyle.copyWith(fontSize: 15),
           ),
           const SizedBox(
@@ -511,4 +536,43 @@ void showInternetConnectionWarning() {
       backgroundColor: secondaryForegroundColor,
       textColor: Colors.white,
       fontSize: 16.0);
+  IronSource.hideBanner();
+}
+
+initAds() async {
+  IronSource.setFlutterVersion('3.13.6');
+  IronSource.setLevelPlayBannerListener(BannerListener());
+  await IronSource.init(
+      appKey: '<APP_KEY>>', adUnits: [IronSourceAdUnit.Banner]);
+  await IronSource.loadBanner(
+      size: IronSourceBannerSize.BANNER,
+      position: IronSourceBannerPosition.Bottom);
+}
+
+class BannerListener extends LevelPlayBannerListener {
+  @override
+  void onAdLoaded(IronSourceAdInfo adInfo) {}
+
+  @override
+  void onAdLoadFailed(IronSourceError error) async {
+    if (error.errorCode == 606) {
+      await IronSource.loadBanner(
+          size: IronSourceBannerSize.BANNER,
+          position: IronSourceBannerPosition.Bottom);
+    }
+  }
+
+  @override
+  void onAdScreenPresented(IronSourceAdInfo adInfo) {}
+
+  @override
+  void onAdClicked(IronSourceAdInfo adInfo) {}
+
+  @override
+  void onAdLeftApplication(IronSourceAdInfo adInfo) {}
+
+  @override
+  void onAdScreenDismissed(IronSourceAdInfo adInfo) {}
+
+// Implement other listener methods similarly, using _state to communicate
 }

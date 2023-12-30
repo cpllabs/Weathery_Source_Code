@@ -4,26 +4,45 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-var heads = ["Good ", "", "Lazy ", "Cheerful ", "Amazing "];
-var morningMessages = [
+List<String> heads = [
+  "Good ",
+  "",
+  "Lazy ",
+  "Cheerful ",
+  "Amazing ",
+  "Sleepy ",
+  "Cozy "
+];
+List<String> morningMessages = [
   "Going Outside ?",
+  "Ready To Conquer The Day?",
   '',
   "Going For a Morning Walk ?",
+  "Ready For a Great Day ?",
   "Going For Work ?"
 ];
-var noonMessages = [
+List<String> noonMessages = [
+  "Ready To Tackle The Afternoon?",
   "Going Outside For a Lunch ?",
   'Going Outside ?',
   "Tired on Work ?",
   "Going For a Brunch ?",
 ];
-var nightMessages = [
+List<String> nightMessages = [
   "Going For a Dinner ?",
   '',
   "Going For a Candle Light Dinner ?",
   "Going For a Nightout ?",
   'Going For a Party ?',
+  "Preparing For a Party ?",
+  "Planning a Nightout ?",
   'Going To a Club ?'
+];
+
+List<String> shareMessages = [
+  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nPowered By Weathery From https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
+  "Check Out The Current Weather In %USERCITY, %USERCOUNTRY!\nPowered By Weathery @ https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
+  "Current Weather Conditions Of %USERCITY, %USERCOUNTRY\nPowered By Weathery From https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
 ];
 
 class Greetings {
@@ -127,7 +146,6 @@ Future<List> getNightNotificationValues() async {
   return output;
 }
 
-
 class NotificationSettings {
   var prefObj;
   Future initPrefObj() async {
@@ -158,18 +176,21 @@ class NotificationSettings {
   void _saveNightStatus(status) async {
     await prefObj.setBool('NightNotifyStatus', status);
   }
+
   @pragma('vm:entry-point')
   getMorningSavedStatus() {
     return ((prefObj.getBool('MorningNotifyStatus') == null)
         ? true
         : prefObj.getBool('MorningNotifyStatus'));
   }
+
   @pragma('vm:entry-point')
   getNoonSavedStatus() {
     return ((prefObj.getBool('NoonNotifyStatus') == null)
         ? true
         : prefObj.getBool('NoonNotifyStatus'));
   }
+
   @pragma('vm:entry-point')
   getNightSavedStatus() {
     return ((prefObj.getBool('NightNotifyStatus') == null)
@@ -178,32 +199,40 @@ class NotificationSettings {
   }
 }
 
-
-String analyzeWeather(Map<String, dynamic> body){
+String analyzeWeather(Map<String, dynamic> body) {
   String out = "";
-  List<List<int>> multiPurposeDescVar =[[],[]];
+  List<List<int>> multiPurposeDescVar = [[], []];
   int currentHour = DateTime.now().hour;
-  for(int i = currentHour; i <= currentHour+3; i++){
-    multiPurposeDescVar[0].add(body["forecast"]['forecastday'][0]["hour"][i]["will_it_rain"]);
+  for (int i = currentHour; i <= currentHour + 6; i++) {
+    multiPurposeDescVar[0]
+        .add(body["forecast"]['forecastday'][0]["hour"][i]["will_it_rain"]);
+    multiPurposeDescVar[1]
+        .add(body["forecast"]['forecastday'][0]["hour"][i]["will_it_snow"]);
   }
   bool multi = false;
-  if (multiPurposeDescVar[0].contains(1)){
+  if (multiPurposeDescVar[0].contains(1)) {
     out = "Possibilities of Rain";
     multi = true;
   }
-  if (multiPurposeDescVar[1].contains(1)){
-    out += (multi) ? ", Snowfall": "Possibilities of Snowfall";
+  if (multiPurposeDescVar[1].contains(1)) {
+    out += (multi) ? ", Snowfall" : "Possibilities of Snowfall";
     multi = true;
   }
   return out;
 }
 
-
-String analyzeTemperature(Map<String, dynamic> body){
-  List<double> multiPurposeDescVar =[];
+String analyzeTemperature(Map<String, dynamic> body) {
+  List<double> multiPurposeDescVar = [];
   int currentHour = DateTime.now().hour;
-  for(int i = currentHour; i <= currentHour+3; i++){
-    multiPurposeDescVar.add(body["forecast"]['forecastday'][0]["hour"][i]["temp_c"]);
+  for (int i = currentHour; i <= currentHour + 6; i++) {
+    multiPurposeDescVar
+        .add(body["forecast"]['forecastday'][0]["hour"][i]["temp_c"]);
   }
   return "Ranging From ${multiPurposeDescVar.reduce(min)}°C To ${multiPurposeDescVar.reduce(max)}°C";
+}
+
+String getShareMessage(city, country) {
+  return shareMessages[Random().nextInt(shareMessages.length)]
+      .replaceAll("%USERCITY", city)
+      .replaceAll("%USERCOUNTRY", country);
 }

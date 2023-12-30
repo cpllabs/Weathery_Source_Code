@@ -60,10 +60,10 @@ Future<void> getCurrentLocation() async {
               double long = position.longitude;
 
               FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-              FlutterLocalNotificationsPlugin();
+                  FlutterLocalNotificationsPlugin();
               flutterLocalNotificationsPlugin
                   .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>()
+                      AndroidFlutterLocalNotificationsPlugin>()
                   ?.requestPermission();
 
               var locationObj = Location();
@@ -83,12 +83,11 @@ Future<void> getCurrentLocation() async {
       ],
     );
   } else {
-
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+        FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.requestPermission();
 
     Position position = await Geolocator.getCurrentPosition(
@@ -96,7 +95,6 @@ Future<void> getCurrentLocation() async {
 
     double lat = position.latitude;
     double long = position.longitude;
-
 
     var locationObj = Location();
     await locationObj.initPrefObj();
@@ -189,6 +187,7 @@ void setData(var body) {
   setForecast(body['forecast']['forecastday']);
   setRainInfo(measure: rainvalue, desc: descOfRain);
   setWeatherData(
+      rainData: analyzeWeather(body),
       temp: body["current"]["temp_c"].toString(),
       desc: body["current"]["condition"]["text"],
       feels: body["current"]["feelslike_c"].toString(),
@@ -344,9 +343,11 @@ Future<void> MorningMessage() async {
   var obj = NotificationSettings();
   await obj.initPrefObj();
   if (obj.getMorningSavedStatus()) {
-    List weatherInfo = await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
+    List weatherInfo =
+        await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
     var message = await getMorningNotificationValues();
-    String dispMessage = message[1] + ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
+    String dispMessage = message[1] +
+        ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
         "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
     NotificationManger()
         .showMorningNotification(message[0], dispMessage, weatherInfo[3]);
@@ -358,13 +359,16 @@ Future NoonMessage() async {
   var obj = NotificationSettings();
   await obj.initPrefObj();
   if (obj.getNoonSavedStatus()) {
-  List weatherInfo = await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
-  var message = await getNoonNotificationValues();
-  String dispMessage = message[1] + ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
-      "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
-  NotificationManger()
-      .showNoonNotification(message[0], dispMessage, weatherInfo[3]);
-}}
+    List weatherInfo =
+        await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
+    var message = await getNoonNotificationValues();
+    String dispMessage = message[1] +
+        ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
+        "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
+    NotificationManger()
+        .showNoonNotification(message[0], dispMessage, weatherInfo[3]);
+  }
+}
 
 @pragma('vm:entry-point')
 Future NightMessage() async {
@@ -372,9 +376,11 @@ Future NightMessage() async {
   await obj.initPrefObj();
 
   if (obj.getNightSavedStatus()) {
-    List weatherInfo = await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
+    List weatherInfo =
+        await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
     var message = await getNightNotificationValues();
-    String dispMessage = message[1] + ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
+    String dispMessage = message[1] +
+        ((weatherInfo[1].isEmpty) ? "" : '\n${weatherInfo[1]}') +
         "\nTemprature : ${weatherInfo[0]}\nCurrent Condition : ${weatherInfo[2]}\nActive Alerts : ${weatherInfo[4]} Alerts";
     NotificationManger()
         .showNightNotification(message[0], dispMessage, weatherInfo[3]);

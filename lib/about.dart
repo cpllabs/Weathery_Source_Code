@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import "package:url_launcher/url_launcher_string.dart";
+import 'package:ironsource_mediation/ironsource_mediation.dart';
 import 'package:weathery/semiWidgets.dart';
 import 'package:weathery/themeData.dart';
 
@@ -8,6 +8,7 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    IronSource.hideBanner();
     return Scaffold(
       drawer: SideNavBar(),
       appBar: AppBar(
@@ -38,7 +39,7 @@ class AboutPage extends StatelessWidget {
                   height: 10,
                 ),
                 Text(
-                  "Version : 1.0.5",
+                  "Version : 1.1.0",
                   style: captionStyle,
                 ),
                 const SizedBox(
@@ -46,17 +47,19 @@ class AboutPage extends StatelessWidget {
                 ),
                 Text(
                   "Weathery is a Weather App built with Flutter using Weather.com API which "
-                      "provides weather updates and alerts to users. Weathery filters out unnecessary "
-                      "information that don't matter to normal people",
+                  "provides weather updates and alerts to users. Weathery filters out unnecessary "
+                  "information that don't matter to normal people",
                   style:
                       captionStyle.copyWith(fontSize: 18, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(
                   height: 25,
-                ), Text(
+                ),
+                Text(
                   "Project By : AryanshDev",
-                  style: headingStyle.copyWith(fontSize: 20,fontWeight: FontWeight.w600),
+                  style: headingStyle.copyWith(
+                      fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(
                   height: 25,

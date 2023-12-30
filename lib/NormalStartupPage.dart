@@ -1,15 +1,11 @@
-import 'package:weathery/notifications.dart';
-
 import "semiWidgets.dart";
 import 'apiData.dart';
 import 'package:flutter/material.dart';
 import 'themeData.dart';
-import 'main.dart';
 
 class NormalStartUp extends StatefulWidget {
   NormalStartUp({Key? key}) : super(key: key) {
     getCurrentLocation();
-
   }
 
   @override
@@ -17,6 +13,20 @@ class NormalStartUp extends StatefulWidget {
 }
 
 class _NormalStartUpState extends State<NormalStartUp> {
+  @override
+  void initState() {
+    super.initState();
+    _initAds(); // Call the async function without await
+  }
+
+  Future<void> _initAds() async {
+    try {
+      await initAds();
+    } catch (error) {
+      print('Error during ad initialization: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,14 +47,15 @@ class _NormalStartUpState extends State<NormalStartUp> {
                   padding: const EdgeInsets.only(top: 30),
                   child: Text(
                     "Welcome",
-                    style:headingStyle,
+                    style: headingStyle,
                   ),
                 ),
                 Container(
                   margin: const EdgeInsets.fromLTRB(35, 15, 35, 0),
                   child: RotationAnimation(
                     childToRotate: Image.asset(
-                      "assets/weathery_loading_icon.png",),
+                      "assets/weathery_loading_icon.png",
+                    ),
                   ),
                 ),
                 const SizedBox(
