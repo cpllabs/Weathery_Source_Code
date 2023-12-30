@@ -543,7 +543,7 @@ initAds() async {
   IronSource.setFlutterVersion('3.13.6');
   IronSource.setLevelPlayBannerListener(BannerListener());
   await IronSource.init(
-      appKey: '<APP_KEY>>', adUnits: [IronSourceAdUnit.Banner]);
+      appKey: '<APP_KEY>', adUnits: [IronSourceAdUnit.Banner]);
   await IronSource.loadBanner(
       size: IronSourceBannerSize.BANNER,
       position: IronSourceBannerPosition.Bottom);
