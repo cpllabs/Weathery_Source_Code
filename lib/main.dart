@@ -12,6 +12,7 @@ import 'firstStartupPage.dart';
 import 'NormalStartupPage.dart';
 
 var userName = UserName();
+var favLocationPref = FavouriteLocations();
 final globalNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
@@ -58,6 +59,7 @@ void main() async {
     wakeup: true,
   );
   String route = '';
+  await favLocationPref.initPrefObj();
   await userName.initPrefObj();
   if (userName.getName() == null) {
     route = "/first";
@@ -88,6 +90,7 @@ class MainApp extends StatelessWidget {
         '/normal': (context) => NormalStartUp(),
         "/main": (context) => MainScreen(
               userNameObj: userName,
+            favLocationObj : favLocationPref
             ),
         "/about": (context) => const AboutPage(),
         "/settings": (context) => const SettingsPage(),

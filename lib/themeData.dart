@@ -4,7 +4,7 @@ Color primaryBackgroundColor = const Color(0xFF0A0E21);
 Color primaryForegroundColor = const Color(0xFF1D1E33);
 Color secondaryForegroundColor = const Color(0xFF111328);
 Color primaryTextColor = Colors.white;
-Color secondaryTextColor = const Color(0xFF8D8E98);
+Color secondaryTextColor =  Color(0xFF8D8E98);
 Color buttonColor = const Color(0xFFEB1555);
 
 ThemeData mainTheme = ThemeData(

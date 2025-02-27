@@ -101,7 +101,7 @@ class firstStartUp extends StatelessWidget {
                       Navigator.pushReplacementNamed(context, "/normal");
                     } else {
                       Fluttertoast.showToast(
-                          msg: "Name cannot be empty",
+                          msg: "Name Cannot Be Empty",
                           toastLength: Toast.LENGTH_LONG,
                           gravity: ToastGravity.TOP,
                           backgroundColor: secondaryForegroundColor,

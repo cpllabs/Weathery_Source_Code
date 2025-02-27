@@ -11,7 +11,9 @@ import 'package:weathery/semiWidgets.dart';
 import 'themeData.dart';
 import 'localValues.dart';
 
+
 String userCountry = '',
+    userState = '',
     userCity = '',
     tempCurrent = '',
     descCurrent = '',
@@ -30,7 +32,7 @@ List<Widget> alerts = [], forecastsWidgetList = [];
 
 class MainScreen extends StatefulWidget {
   var userNameObjPassed;
-  MainScreen({Key? key, userNameObj}) : super(key: key) {
+  MainScreen({Key? key, userNameObj,favLocationObj}) : super(key: key) {
     userNameObjPassed = userNameObj;
     IronSource.hideBanner();
   }
@@ -525,7 +527,7 @@ class _MainScreenState extends State<MainScreen> {
               Offstage(
                 offstage: !isVisible,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 25, 15, 25),
+                  padding: const EdgeInsets.fromLTRB(15, 500, 15, 25),
                   child: RepaintBoundary(
                     key: _globalKey,
                     child: Container(
@@ -680,10 +682,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-void setLocationData({city, country, isday}) {
+void setLocationData({city, state, country, isday}) {
   userCountry = country;
+  userState = state;
   userCity = city;
-  int val = DateTime.now().hour;
   if (isday == 1) {
     bgimage = "day";
   } else {

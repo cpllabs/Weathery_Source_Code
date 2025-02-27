@@ -111,7 +111,7 @@ getWeather({lat, long}) async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$lat,$long&aqi=yes&alerts=yes&days=2');
+      'https://api.weatherapi.com/v1/forecast.json?key=f860852440924b7485990349231704&q=$lat,$long&aqi=yes&alerts=yes&days=2');
   var response;
   try {
     response = await http.get(url);
@@ -142,6 +142,7 @@ void setData(var body) {
   alerts.clear();
   setLocationData(
     city: body['location']["name"],
+    state: body['location']["region"],
     country: body['location']["country"],
     isday: body["current"]["is_day"],
   );
@@ -205,7 +206,7 @@ void getWeatherFromName({city}) async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$city&aqi=yes&alerts=yes&days=2');
+      'https://api.weatherapi.com/v1/forecast.json?key=f860852440924b7485990349231704&q=$city&aqi=yes&alerts=yes&days=2');
   var response;
   try {
     response = await http.get(url);
@@ -242,7 +243,7 @@ Future<dynamic> searchlocationNames({str}) async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/search.json?key=<API_KEY>&q=$str');
+      'https://api.weatherapi.com/v1/search.json?key=f860852440924b7485990349231704&q=$str');
   var response;
   try {
     response = await http.get(url);
@@ -318,7 +319,7 @@ Future<List> BackGroundWeather() async {
   var positionCord = locObj.getLastKnowLocation();
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$positionCord&alerts=yes&days=1');
+      'https://api.weatherapi.com/v1/forecast.json?key=f860852440924b7485990349231704&q=$positionCord&alerts=yes&days=1');
   var response;
   try {
     response = await http.get(url);

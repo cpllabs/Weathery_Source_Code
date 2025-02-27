@@ -39,7 +39,7 @@ class AboutPage extends StatelessWidget {
                   height: 10,
                 ),
                 Text(
-                  "Version : 1.1.0",
+                  "Version : 1.2.0",
                   style: captionStyle,
                 ),
                 const SizedBox(

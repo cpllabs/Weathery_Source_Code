@@ -107,6 +107,37 @@ class Location {
   }
 }
 
+
+class FavouriteLocations {
+  var prefObj;
+
+  Future initPrefObj() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    prefObj = await SharedPreferences.getInstance();
+  }
+
+  void setLoaction(int slot, String lat,long,placeName,stateName,countryName) {
+    _saveFavLocation(slot, "$placeName,$stateName,$countryName,$lat,$long");
+  }
+
+  void deleteFavLocation(int locNum){
+    _deleteFavLocation(locNum);
+  }
+
+  void _deleteFavLocation(int locNum) async{
+    await prefObj.remove('favLocation$locNum');
+  }
+
+  void _saveFavLocation(int locNum, String combinedString) async {
+    await prefObj.setString('favLocation$locNum', combinedString);
+  }
+
+  dynamic getFavLocation(int locNum) {
+    return prefObj.getString('favLocation$locNum');
+  }
+}
+
+
 @pragma('vm:entry-point')
 Future<List> getMorningNotificationValues() async {
   var userName = UserName();

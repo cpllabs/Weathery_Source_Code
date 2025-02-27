@@ -1,16 +1,15 @@
-import 'dart:ui';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:ironsource_mediation/ironsource_mediation.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:weathery/apiData.dart';
+import 'package:weathery/mainScreen.dart';
 import 'package:weathery/themeData.dart';
 import 'main.dart';
 
 var currentSearchBarContext;
+List<Widget> favsHolders = [SizedBox(),SizedBox(),SizedBox(),SizedBox()];
 
 void alertUser(
     {required Widget title,
@@ -114,18 +113,79 @@ class NoGlowScrollBehaviour extends ScrollBehavior {
 }
 
 class SearchBar extends StatefulWidget {
+
   const SearchBar({Key? key}) : super(key: key);
 
   @override
   State<SearchBar> createState() => _SearchBarState();
+
 }
 
 class _SearchBarState extends State<SearchBar> {
-  TextEditingController searchController = TextEditingController();
-  List<Widget> suggestions = [];
+  updateSearchBarState(){
 
+    setState(() {
+      if (favLocationPref.getFavLocation(1) != null){
+        favsHolders[0] = FavouriteLocationWidget(slotNum: 1 , updfnc: updateSearchBarState);
+      }
+      else{
+        favsHolders[0] = EmptyFavouriteLocation(numSlot: 1, updfnc: updateSearchBarState,);
+      }
+      if (favLocationPref.getFavLocation(2) != null){
+        favsHolders[1] = FavouriteLocationWidget(slotNum: 2, updfnc: updateSearchBarState);
+      }
+      else{
+        favsHolders[1] = EmptyFavouriteLocation(numSlot: 2, updfnc: updateSearchBarState);
+      }
+
+      if (favLocationPref.getFavLocation(3) != null){
+        favsHolders[2] = FavouriteLocationWidget(slotNum: 3, updfnc: updateSearchBarState);
+      }
+      else{
+        favsHolders[2] = EmptyFavouriteLocation(numSlot: 3, updfnc: updateSearchBarState);
+      }
+
+      if (favLocationPref.getFavLocation(4) != null){
+        favsHolders[3] = FavouriteLocationWidget(slotNum: 4, updfnc: updateSearchBarState);
+      }
+      else{
+        favsHolders[3] = EmptyFavouriteLocation(numSlot: 4, updfnc: updateSearchBarState);
+      }
+
+    });
+  }
+  TextEditingController searchController = TextEditingController();
+_SearchBarState(){
+  if (favLocationPref.getFavLocation(1) != null){
+    favsHolders[0] = FavouriteLocationWidget(slotNum: 1, updfnc: updateSearchBarState);
+  }
+  else{
+    favsHolders[0] = EmptyFavouriteLocation(numSlot: 1, updfnc: updateSearchBarState,);
+  }
+  if (favLocationPref.getFavLocation(2) != null){
+    favsHolders[1] = FavouriteLocationWidget(slotNum: 2, updfnc: updateSearchBarState,);
+  }
+  else{
+    favsHolders[1] = EmptyFavouriteLocation(numSlot: 2, updfnc: updateSearchBarState);
+  }
+
+  if (favLocationPref.getFavLocation(3) != null){
+    favsHolders[2] = FavouriteLocationWidget(slotNum: 3, updfnc: updateSearchBarState);
+  }
+  else{
+    favsHolders[2] = EmptyFavouriteLocation(numSlot: 3, updfnc: updateSearchBarState);
+  }
+  if (favLocationPref.getFavLocation(4) != null){
+    favsHolders[3] = FavouriteLocationWidget(slotNum: 4, updfnc: updateSearchBarState);
+  }
+  else{
+    favsHolders[3] = EmptyFavouriteLocation(numSlot: 4, updfnc: updateSearchBarState);
+  }
+}
+  List<Widget> suggestions = [];
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -134,7 +194,7 @@ class _SearchBarState extends State<SearchBar> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(7.5, 7.5, 7.5, 0),
+                  padding: const EdgeInsets.fromLTRB(5, 7.5, 5, 0),
                   child: TextField(
                     maxLines: 1,
                     decoration: InputDecoration(
@@ -211,11 +271,49 @@ class _SearchBarState extends State<SearchBar> {
                 const SizedBox(
                   height: 10,
                 ),
-                ScrollConfiguration(
-                  behavior: NoGlowScrollBehaviour(),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: suggestions,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(5, 0, 5, 7.5),
+                  child: ScrollConfiguration(
+                    behavior: NoGlowScrollBehaviour(),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: favsHolders[0],
+                              ),
+                              Expanded(
+                                child: favsHolders[1],
+                              ),
+
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: favsHolders[2],
+                              ),
+                              Expanded(
+                                child: favsHolders[3],
+                              ),
+
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 3,
+                          ),
+                           Divider(
+                            thickness: 1.25,
+                            indent: 10,
+                            endIndent: 10,
+                            color: secondaryTextColor,
+                          ),
+                          Column(
+                            children: suggestions,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -283,20 +381,20 @@ class SearchSuggestionObject extends StatelessWidget {
   }
 }
 
-OverlayEntry? entry;
+OverlayEntry? SearchOverlayEntry;
 void showSearchOverlay(BuildContext context) {
   IronSource.displayBanner();
   currentSearchBarContext = context;
-  entry = OverlayEntry(
+  SearchOverlayEntry = OverlayEntry(
     builder: (context) => const SearchBar(),
   );
   final overlay = Overlay.of(context);
-  overlay.insert(entry!);
+  overlay.insert(SearchOverlayEntry!);
 }
 
 void closeSearchOverlay() {
   IronSource.hideBanner();
-  entry!.remove();
+  SearchOverlayEntry!.remove();
 }
 
 class SideNavBar extends StatefulWidget {
@@ -422,6 +520,7 @@ class ForecastDisplayObject extends StatelessWidget {
     temp = dataObjct["temp_c"];
     time = DateFormat("h:mm a\nd MMM").format(
         DateTime.fromMillisecondsSinceEpoch(dataObjct["time_epoch"] * 1000));
+
   }
 
   @override
@@ -435,10 +534,11 @@ class ForecastDisplayObject extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Image.asset('assets/$icon'),
+
           Text('$temp °C'),
           Text(
             desc,
-            style: captionStyle.copyWith(fontSize: 10),
+            style: captionStyle.copyWith(fontSize: 11),
             textAlign: TextAlign.center,
           ),
         ],
@@ -543,15 +643,19 @@ initAds() async {
   IronSource.setFlutterVersion('3.13.6');
   IronSource.setLevelPlayBannerListener(BannerListener());
   await IronSource.init(
-      appKey: '<APP_KEY>', adUnits: [IronSourceAdUnit.Banner]);
+      appKey: '1cf91ef35', adUnits: [IronSourceAdUnit.Banner]);
   await IronSource.loadBanner(
       size: IronSourceBannerSize.BANNER,
       position: IronSourceBannerPosition.Bottom);
+  IronSource.validateIntegration();
+
 }
 
 class BannerListener extends LevelPlayBannerListener {
   @override
-  void onAdLoaded(IronSourceAdInfo adInfo) {}
+  void onAdLoaded(IronSourceAdInfo adInfo) {
+    print(adInfo);
+  }
 
   @override
   void onAdLoadFailed(IronSourceError error) async {
@@ -563,7 +667,9 @@ class BannerListener extends LevelPlayBannerListener {
   }
 
   @override
-  void onAdScreenPresented(IronSourceAdInfo adInfo) {}
+  void onAdScreenPresented(IronSourceAdInfo adInfo) {
+
+  }
 
   @override
   void onAdClicked(IronSourceAdInfo adInfo) {}
@@ -575,4 +681,184 @@ class BannerListener extends LevelPlayBannerListener {
   void onAdScreenDismissed(IronSourceAdInfo adInfo) {}
 
 // Implement other listener methods similarly, using _state to communicate
+}
+
+class EmptyFavouriteLocation extends StatefulWidget {
+
+  final int numSlot;
+  final VoidCallback updfnc;
+  const EmptyFavouriteLocation({super.key, required this.updfnc, required this.numSlot});
+
+  @override
+  State<EmptyFavouriteLocation> createState() => _EmptyFavouriteLocationState(slot:  this.numSlot, updateFunction: this.updfnc);
+}
+
+class _EmptyFavouriteLocationState extends State<EmptyFavouriteLocation> {
+  int slot  = 0;
+  final VoidCallback? updateFunction;
+  _EmptyFavouriteLocationState({slot, this.updateFunction}){
+    this.slot = slot;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        height: 72.5,
+        decoration: BoxDecoration(
+            border: Border.all(color: secondaryTextColor.withAlpha(150)),
+            borderRadius: const BorderRadius.all(Radius.circular(8))),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Text(
+                  "Add Current Location as Favourite",
+                  style: captionStyle.copyWith(fontSize: 14.5),
+                ),
+              ),
+            ),
+            Expanded(
+              child: MaterialButton(
+                splashColor: secondaryForegroundColor,
+                padding: const EdgeInsets.all(0),
+                onPressed: () {
+                   favLocationPref.setLoaction(
+                      slot,
+                      posLat, posLong, userCity, userState, userCountry);
+                  updateFunction?.call();
+                },
+                child: Icon(
+                  Icons.add,
+                  size: 30,
+                  color: secondaryTextColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+class FavouriteLocationWidget extends StatefulWidget {
+  final int slotNum;
+  final VoidCallback updfnc;
+  const FavouriteLocationWidget({super.key, required this.updfnc, required this.slotNum});
+
+  @override
+  State<FavouriteLocationWidget> createState() => _FavouriteLocationWidget(slotNum:this.slotNum, updateCallback: this.updfnc);
+}
+
+class _FavouriteLocationWidget extends State<FavouriteLocationWidget> {
+
+    String lat = "", long = "", city = "", state = "", country = "";
+    int slot= 0;
+    final VoidCallback updateCallback;
+    _FavouriteLocationWidget({slotNum, required this.updateCallback}) {
+      slot = slotNum;
+      dynamic raw = favLocationPref.getFavLocation(slotNum);
+      if (raw != null) {
+        List<String> values = raw.split(',');
+        lat = values[3];
+        long = values[4];
+        city = values[0].length > 13  ? '${values[0].substring(0,13)}..' : values[0];
+        state = values[1].length > 18  ? '${values[1].substring(0,13)}..' : values[1];
+        country =  values[2].length > 20   ? '${values[2].substring(0,19)}..' : values[2]   ;
+      }
+
+
+  }
+  @override
+  Widget build(BuildContext context) {
+    return  Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        height: 72.5,
+        padding: EdgeInsets.all(0),
+        decoration: BoxDecoration(
+            border: Border.all(color: primaryTextColor),
+            borderRadius: const BorderRadius.all(Radius.circular(8))),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              flex: 3,
+              child: MaterialButton(
+                padding:const EdgeInsets.fromLTRB(6,5.0,0,5.0),
+                onPressed: () {
+                  closeSearchOverlay();
+                  getWeather(lat: lat, long:long);
+                  IronSource.displayBanner();
+                  alertUser(
+                      title: const SizedBox(
+                        height: 0,
+                        width: 0,
+                      ),
+                      content: SizedBox(
+                        height: 120,
+                        width: 80,
+                        child: RotationAnimation(
+                          childToRotate: Image.asset(
+                            "assets/weathery_loading_icon.png",
+                            height: 150,
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        const SizedBox(
+                          height: 0,
+                          width: 0,
+                        )
+                      ]);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                  children: [
+                    Text(
+                      "$city",
+                      style: headingStyle.copyWith(fontSize: 16),
+                    ),
+                    Text(
+                      "$state",
+                      style: captionStyle.copyWith(fontSize: 14),
+                    ),
+                    Text(
+                      "$country",
+                      style: captionStyle.copyWith(fontSize:14),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: MaterialButton(
+                splashColor: secondaryForegroundColor,
+                padding: const EdgeInsets.all(0),
+                onPressed: () {
+                  favLocationPref.deleteFavLocation(slot);
+                  updateCallback.call();
+                },
+                child: Icon(
+                  Icons.delete,
+                  size: 30,
+                  color: secondaryTextColor,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
