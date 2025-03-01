@@ -9,7 +9,7 @@ Color buttonColor = const Color(0xFFEB1555);
 
 ThemeData mainTheme = ThemeData(
   useMaterial3: false,
-  fontFamily: "PT Sans",
+  fontFamily:  "PT Sans",
   brightness: Brightness.dark,
   primaryColor: primaryBackgroundColor,
   appBarTheme: AppBarTheme(backgroundColor: primaryBackgroundColor),
