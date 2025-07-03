@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
-import 'package:ironsource_mediation/ironsource_mediation.dart';
+// import 'package:ironsource_mediation/ironsource_mediation.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:weathery/apiData.dart';
-import 'package:weathery/mainScreen.dart';
+import 'package:weathery/Functionalities/DataProviders.dart';
+import 'package:weathery/Functionalities/apiData.dart';
+import 'package:weathery/Screens/mainScreen.dart';
 import 'package:weathery/themeData.dart';
 import 'main.dart';
 
+final providerReaderContainer = ProviderContainer();
+
 var currentSearchBarContext;
-List<Widget> favsHolders = [SizedBox(),SizedBox(),SizedBox(),SizedBox()];
+List<Widget> favsHolders = [SizedBox(), SizedBox(), SizedBox(), SizedBox()];
 
 void alertUser(
     {required Widget title,
@@ -113,79 +119,148 @@ class NoGlowScrollBehaviour extends ScrollBehavior {
 }
 
 class SearchBar extends StatefulWidget {
-
   const SearchBar({Key? key}) : super(key: key);
 
   @override
   State<SearchBar> createState() => _SearchBarState();
-
 }
 
 class _SearchBarState extends State<SearchBar> {
-  updateSearchBarState(){
+  NativeAd? _nativeAd;
+  bool _isNativeAdLoaded = false;
 
+  void _loadNativeAd() {
+    _nativeAd = NativeAd(
+      nativeTemplateStyle: NativeTemplateStyle(
+          primaryTextStyle: NativeTemplateTextStyle(
+              textColor: Colors.white,
+              style: NativeTemplateFontStyle.bold,
+              size: 16.0),
+          secondaryTextStyle:
+              NativeTemplateTextStyle(textColor: Colors.grey, size: 12.0),
+          tertiaryTextStyle:
+              NativeTemplateTextStyle(textColor: Colors.grey, size: 10.0),
+          templateType: TemplateType.medium,
+          mainBackgroundColor: primaryForegroundColor,
+          cornerRadius: 10),
+      adUnitId: "<AD_ID>",
+      factoryId: 'listTile',
+      request: const AdRequest(),
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _nativeAd = ad as NativeAd;
+            _isNativeAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          _nativeAd = null;
+          setState(() {
+            _isNativeAdLoaded = false;
+          });
+          _loadNativeAd();
+        },
+      ),
+    )..load();
+  }
+
+  @override
+  void initState() {
+    _loadNativeAd();
+    super.initState();
+  }
+
+  updateSearchBarState() {
     setState(() {
-      if (favLocationPref.getFavLocation(1) != null){
-        favsHolders[0] = FavouriteLocationWidget(slotNum: 1 , updfnc: updateSearchBarState);
+      if (providerReaderContainer
+              .read(favLocationProvider)
+              .prefObj
+              .getString('favLocation1') !=
+          null) {
+        favsHolders[0] =
+            FavouriteLocationWidget(slotNum: 1, updfnc: updateSearchBarState);
+      } else {
+        favsHolders[0] = EmptyFavouriteLocation(
+          numSlot: 1,
+          updfnc: updateSearchBarState,
+        );
       }
-      else{
-        favsHolders[0] = EmptyFavouriteLocation(numSlot: 1, updfnc: updateSearchBarState,);
-      }
-      if (favLocationPref.getFavLocation(2) != null){
-        favsHolders[1] = FavouriteLocationWidget(slotNum: 2, updfnc: updateSearchBarState);
-      }
-      else{
-        favsHolders[1] = EmptyFavouriteLocation(numSlot: 2, updfnc: updateSearchBarState);
-      }
-
-      if (favLocationPref.getFavLocation(3) != null){
-        favsHolders[2] = FavouriteLocationWidget(slotNum: 3, updfnc: updateSearchBarState);
-      }
-      else{
-        favsHolders[2] = EmptyFavouriteLocation(numSlot: 3, updfnc: updateSearchBarState);
-      }
-
-      if (favLocationPref.getFavLocation(4) != null){
-        favsHolders[3] = FavouriteLocationWidget(slotNum: 4, updfnc: updateSearchBarState);
-      }
-      else{
-        favsHolders[3] = EmptyFavouriteLocation(numSlot: 4, updfnc: updateSearchBarState);
+      if (providerReaderContainer.read(favLocationProvider).getFavLocation(2) !=
+          null) {
+        favsHolders[1] =
+            FavouriteLocationWidget(slotNum: 2, updfnc: updateSearchBarState);
+      } else {
+        favsHolders[1] =
+            EmptyFavouriteLocation(numSlot: 2, updfnc: updateSearchBarState);
       }
 
+      if (providerReaderContainer.read(favLocationProvider).getFavLocation(3) !=
+          null) {
+        favsHolders[2] =
+            FavouriteLocationWidget(slotNum: 3, updfnc: updateSearchBarState);
+      } else {
+        favsHolders[2] =
+            EmptyFavouriteLocation(numSlot: 3, updfnc: updateSearchBarState);
+      }
+
+      if (providerReaderContainer.read(favLocationProvider).getFavLocation(4) !=
+          null) {
+        favsHolders[3] =
+            FavouriteLocationWidget(slotNum: 4, updfnc: updateSearchBarState);
+      } else {
+        favsHolders[3] =
+            EmptyFavouriteLocation(numSlot: 4, updfnc: updateSearchBarState);
+      }
     });
   }
-  TextEditingController searchController = TextEditingController();
-_SearchBarState(){
-  if (favLocationPref.getFavLocation(1) != null){
-    favsHolders[0] = FavouriteLocationWidget(slotNum: 1, updfnc: updateSearchBarState);
-  }
-  else{
-    favsHolders[0] = EmptyFavouriteLocation(numSlot: 1, updfnc: updateSearchBarState,);
-  }
-  if (favLocationPref.getFavLocation(2) != null){
-    favsHolders[1] = FavouriteLocationWidget(slotNum: 2, updfnc: updateSearchBarState,);
-  }
-  else{
-    favsHolders[1] = EmptyFavouriteLocation(numSlot: 2, updfnc: updateSearchBarState);
-  }
 
-  if (favLocationPref.getFavLocation(3) != null){
-    favsHolders[2] = FavouriteLocationWidget(slotNum: 3, updfnc: updateSearchBarState);
+  TextEditingController searchController = TextEditingController();
+  _SearchBarState() {
+    if (providerReaderContainer
+            .read(favLocationProvider)
+            .prefObj
+            .getString('favLocation1') !=
+        null) {
+      favsHolders[0] =
+          FavouriteLocationWidget(slotNum: 1, updfnc: updateSearchBarState);
+    } else {
+      favsHolders[0] = EmptyFavouriteLocation(
+        numSlot: 1,
+        updfnc: updateSearchBarState,
+      );
+    }
+    if (providerReaderContainer.read(favLocationProvider).getFavLocation(2) !=
+        null) {
+      favsHolders[1] = FavouriteLocationWidget(
+        slotNum: 2,
+        updfnc: updateSearchBarState,
+      );
+    } else {
+      favsHolders[1] =
+          EmptyFavouriteLocation(numSlot: 2, updfnc: updateSearchBarState);
+    }
+
+    if (providerReaderContainer.read(favLocationProvider).getFavLocation(3) !=
+        null) {
+      favsHolders[2] =
+          FavouriteLocationWidget(slotNum: 3, updfnc: updateSearchBarState);
+    } else {
+      favsHolders[2] =
+          EmptyFavouriteLocation(numSlot: 3, updfnc: updateSearchBarState);
+    }
+    if (providerReaderContainer.read(favLocationProvider).getFavLocation(4) !=
+        null) {
+      favsHolders[3] =
+          FavouriteLocationWidget(slotNum: 4, updfnc: updateSearchBarState);
+    } else {
+      favsHolders[3] =
+          EmptyFavouriteLocation(numSlot: 4, updfnc: updateSearchBarState);
+    }
   }
-  else{
-    favsHolders[2] = EmptyFavouriteLocation(numSlot: 3, updfnc: updateSearchBarState);
-  }
-  if (favLocationPref.getFavLocation(4) != null){
-    favsHolders[3] = FavouriteLocationWidget(slotNum: 4, updfnc: updateSearchBarState);
-  }
-  else{
-    favsHolders[3] = EmptyFavouriteLocation(numSlot: 4, updfnc: updateSearchBarState);
-  }
-}
   List<Widget> suggestions = [];
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -286,7 +361,6 @@ _SearchBarState(){
                               Expanded(
                                 child: favsHolders[1],
                               ),
-
                             ],
                           ),
                           Row(
@@ -297,13 +371,12 @@ _SearchBarState(){
                               Expanded(
                                 child: favsHolders[3],
                               ),
-
                             ],
                           ),
                           const SizedBox(
                             height: 3,
                           ),
-                           Divider(
+                          Divider(
                             thickness: 1.25,
                             indent: 10,
                             endIndent: 10,
@@ -312,6 +385,17 @@ _SearchBarState(){
                           Column(
                             children: suggestions,
                           ),
+                          _isNativeAdLoaded
+                              ? Container(
+                                  margin: EdgeInsets.only(top: 15),
+                                  color: primaryForegroundColor,
+                                  width: double
+                                      .infinity, // Native ads usually take full width
+                                  height: 325,
+
+                                  child: AdWidget(ad: _nativeAd!),
+                                )
+                              : Container(),
                         ],
                       ),
                     ),
@@ -339,7 +423,7 @@ class SearchSuggestionObject extends StatelessWidget {
       onPressed: () {
         closeSearchOverlay();
         getWeatherFromName(city: "$locationCity,$country_region");
-        IronSource.displayBanner();
+        // IronSource.displayBanner();
         alertUser(
             title: const SizedBox(
               height: 0,
@@ -383,7 +467,7 @@ class SearchSuggestionObject extends StatelessWidget {
 
 OverlayEntry? SearchOverlayEntry;
 void showSearchOverlay(BuildContext context) {
-  IronSource.displayBanner();
+  // IronSource.displayBanner();
   currentSearchBarContext = context;
   SearchOverlayEntry = OverlayEntry(
     builder: (context) => const SearchBar(),
@@ -393,7 +477,7 @@ void showSearchOverlay(BuildContext context) {
 }
 
 void closeSearchOverlay() {
-  IronSource.hideBanner();
+  // IronSource.hideBanner();
   SearchOverlayEntry!.remove();
 }
 
@@ -414,6 +498,7 @@ class _SideNavBarState extends State<SideNavBar> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 5,
           children: [
             Container(
               height: 150,
@@ -430,8 +515,7 @@ class _SideNavBarState extends State<SideNavBar> {
               height: 7.5,
             ),
             NavBarItem(Icons.home, "Home", () {
-              Navigator.pushReplacementNamed(
-                  globalNavigatorKey.currentContext!, "/main");
+              context.pushReplacement("/main", extra: DateTime.timestamp());
             }),
             const SizedBox(
               height: 5,
@@ -445,13 +529,20 @@ class _SideNavBarState extends State<SideNavBar> {
               height: 5,
             ),
             NavBarItem(Icons.question_mark_outlined, "About", () {
-              Navigator.pushReplacementNamed(
-                  globalNavigatorKey.currentContext!, "/about");
+              context.go("/about");
             }),
             NavBarItem(Icons.settings, "Settings", () {
-              Navigator.pushReplacementNamed(
-                  globalNavigatorKey.currentContext!, "/settings");
+              context.go("/settings");
             }),
+            const SizedBox(
+              height: 5,
+            ),
+            NavBarItem(Icons.widgets, "Widget", () {
+              context.go("/widgetinfo");
+            }),
+            const SizedBox(
+              height: 5,
+            ),
             NavBarItem(Icons.privacy_tip_sharp, "Privacy Policy", () {
               launchUrlString(
                   "https://aryanshdev.github.io/Weathery/privacy.html",
@@ -487,7 +578,7 @@ class NavBarItem extends StatelessWidget {
       elevation: 5,
       splashColor: primaryBackgroundColor,
       onPressed: () {
-        IronSource.hideBanner();
+        // IronSource.hideBanner();
         onpress!();
       },
       child: Row(
@@ -520,7 +611,6 @@ class ForecastDisplayObject extends StatelessWidget {
     temp = dataObjct["temp_c"];
     time = DateFormat("h:mm a\nd MMM").format(
         DateTime.fromMillisecondsSinceEpoch(dataObjct["time_epoch"] * 1000));
-
   }
 
   @override
@@ -534,7 +624,6 @@ class ForecastDisplayObject extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           Image.asset('assets/$icon'),
-
           Text('$temp °C'),
           Text(
             desc,
@@ -623,9 +712,13 @@ class WeatherAlertDisplayObject extends StatelessWidget {
 }
 
 String formatDate(String dateTimeString) {
-  final dateTime = DateTime.parse(dateTimeString).toLocal();
-  return DateFormat("EE, d MMM yyyy 'a't HH:mm a ").format(dateTime) +
-      DateTime(0).timeZoneName;
+  try {
+    final dateTime = DateTime.parse(dateTimeString).toLocal();
+    return DateFormat("EE, d MMM yyyy 'a't HH:mm a ").format(dateTime) +
+        DateTime(0).timeZoneName;
+  } catch (_) {
+    return dateTimeString;
+  }
 }
 
 void showInternetConnectionWarning() {
@@ -636,67 +729,24 @@ void showInternetConnectionWarning() {
       backgroundColor: secondaryForegroundColor,
       textColor: Colors.white,
       fontSize: 16.0);
-  IronSource.hideBanner();
-}
- 
-initAds() async {
-  IronSource.setFlutterVersion('3.13.6');
-  IronSource.setLevelPlayBannerListener(BannerListener());
-  await IronSource.init(
-      appKey: '<APP_KEY>', adUnits: [IronSourceAdUnit.Banner]);
-  await IronSource.loadBanner(
-      size: IronSourceBannerSize.BANNER,
-      position: IronSourceBannerPosition.Bottom);
-  IronSource.validateIntegration();
-
-}
-
-class BannerListener extends LevelPlayBannerListener {
-  @override
-  void onAdLoaded(IronSourceAdInfo adInfo) {
-    print(adInfo);
-  }
-
-  @override
-  void onAdLoadFailed(IronSourceError error) async {
-    if (error.errorCode == 606) {
-      await IronSource.loadBanner(
-          size: IronSourceBannerSize.BANNER,
-          position: IronSourceBannerPosition.Bottom);
-    }
-  }
-
-  @override
-  void onAdScreenPresented(IronSourceAdInfo adInfo) {
-
-  }
-
-  @override
-  void onAdClicked(IronSourceAdInfo adInfo) {}
-
-  @override
-  void onAdLeftApplication(IronSourceAdInfo adInfo) {}
-
-  @override
-  void onAdScreenDismissed(IronSourceAdInfo adInfo) {}
-
-// Implement other listener methods similarly, using _state to communicate
+  // IronSource.hideBanner();
 }
 
 class EmptyFavouriteLocation extends StatefulWidget {
-
   final int numSlot;
   final VoidCallback updfnc;
-  const EmptyFavouriteLocation({super.key, required this.updfnc, required this.numSlot});
+  const EmptyFavouriteLocation(
+      {super.key, required this.updfnc, required this.numSlot});
 
   @override
-  State<EmptyFavouriteLocation> createState() => _EmptyFavouriteLocationState(slot:  this.numSlot, updateFunction: this.updfnc);
+  State<EmptyFavouriteLocation> createState() => _EmptyFavouriteLocationState(
+      slot: this.numSlot, updateFunction: this.updfnc);
 }
 
 class _EmptyFavouriteLocationState extends State<EmptyFavouriteLocation> {
-  int slot  = 0;
+  int slot = 0;
   final VoidCallback? updateFunction;
-  _EmptyFavouriteLocationState({slot, this.updateFunction}){
+  _EmptyFavouriteLocationState({slot, this.updateFunction}) {
     this.slot = slot;
   }
   @override
@@ -727,9 +777,8 @@ class _EmptyFavouriteLocationState extends State<EmptyFavouriteLocation> {
                 splashColor: secondaryForegroundColor,
                 padding: const EdgeInsets.all(0),
                 onPressed: () {
-                   favLocationPref.setLoaction(
-                      slot,
-                      posLat, posLong, userCity, userState, userCountry);
+                  providerReaderContainer.read(favLocationProvider).setLoaction(
+                      slot, posLat, posLong, userCity, userState, userCountry);
                   updateFunction?.call();
                 },
                 child: Icon(
@@ -746,39 +795,39 @@ class _EmptyFavouriteLocationState extends State<EmptyFavouriteLocation> {
   }
 }
 
-
-
-class FavouriteLocationWidget extends StatefulWidget {
+class FavouriteLocationWidget extends ConsumerStatefulWidget {
   final int slotNum;
   final VoidCallback updfnc;
-  const FavouriteLocationWidget({super.key, required this.updfnc, required this.slotNum});
+  const FavouriteLocationWidget(
+      {super.key, required this.updfnc, required this.slotNum});
 
   @override
-  State<FavouriteLocationWidget> createState() => _FavouriteLocationWidget(slotNum:this.slotNum, updateCallback: this.updfnc);
+  ConsumerState<FavouriteLocationWidget> createState() =>
+      _FavouriteLocationWidget(slot: this.slotNum, updateCallback: this.updfnc);
 }
 
-class _FavouriteLocationWidget extends State<FavouriteLocationWidget> {
-
-    String lat = "", long = "", city = "", state = "", country = "";
-    int slot= 0;
-    final VoidCallback updateCallback;
-    _FavouriteLocationWidget({slotNum, required this.updateCallback}) {
-      slot = slotNum;
-      dynamic raw = favLocationPref.getFavLocation(slotNum);
-      if (raw != null) {
-        List<String> values = raw.split(',');
-        lat = values[3];
-        long = values[4];
-        city = values[0].length > 13  ? '${values[0].substring(0,13)}..' : values[0];
-        state = values[1].length > 18  ? '${values[1].substring(0,13)}..' : values[1];
-        country =  values[2].length > 20   ? '${values[2].substring(0,19)}..' : values[2]   ;
-      }
-
-
+class _FavouriteLocationWidget extends ConsumerState<FavouriteLocationWidget> {
+  String lat = "", long = "", city = "", state = "", country = "";
+  final int slot;
+  final VoidCallback updateCallback;
+  _FavouriteLocationWidget({required this.slot, required this.updateCallback}) {
+    dynamic raw =
+        providerReaderContainer.read(favLocationProvider).getFavLocation(slot);
+    if (raw != null) {
+      List<String> values = raw.split(',');
+      lat = values[3];
+      long = values[4];
+      city =
+          values[0].length > 13 ? '${values[0].substring(0, 13)}..' : values[0];
+      state =
+          values[1].length > 18 ? '${values[1].substring(0, 13)}..' : values[1];
+      country =
+          values[2].length > 20 ? '${values[2].substring(0, 19)}..' : values[2];
+    }
   }
   @override
   Widget build(BuildContext context) {
-    return  Padding(
+    return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Container(
         height: 72.5,
@@ -793,11 +842,11 @@ class _FavouriteLocationWidget extends State<FavouriteLocationWidget> {
             Expanded(
               flex: 3,
               child: MaterialButton(
-                padding:const EdgeInsets.fromLTRB(6,5.0,0,5.0),
+                padding: const EdgeInsets.fromLTRB(6, 5.0, 0, 5.0),
                 onPressed: () {
                   closeSearchOverlay();
-                  getWeather(lat: lat, long:long);
-                  IronSource.displayBanner();
+                  getWeather(lat: lat, long: long);
+                  // IronSource.displayBanner();
                   alertUser(
                       title: const SizedBox(
                         height: 0,
@@ -823,7 +872,6 @@ class _FavouriteLocationWidget extends State<FavouriteLocationWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
                   children: [
                     Text(
                       "$city",
@@ -835,7 +883,7 @@ class _FavouriteLocationWidget extends State<FavouriteLocationWidget> {
                     ),
                     Text(
                       "$country",
-                      style: captionStyle.copyWith(fontSize:14),
+                      style: captionStyle.copyWith(fontSize: 14),
                     )
                   ],
                 ),
@@ -846,7 +894,9 @@ class _FavouriteLocationWidget extends State<FavouriteLocationWidget> {
                 splashColor: secondaryForegroundColor,
                 padding: const EdgeInsets.all(0),
                 onPressed: () {
-                  favLocationPref.deleteFavLocation(slot);
+                  providerReaderContainer
+                      .read(favLocationProvider)
+                      .deleteFavLocation(slot);
                   updateCallback.call();
                 },
                 child: Icon(

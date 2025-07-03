@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/widget_root_layout"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg_gradient"
+    android:gravity="top|center_horizontal"
+    android:padding="8dp">
+
+    <!-- Sun Icon -->
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="2dp"
+        android:contentDescription="Weather Icon"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true" />
+
+    <!-- Temperature Row -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="30sp" />
+
+        <TextView
+            android:id="@+id/degreeTXT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="°C"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Weather Description -->
+    <TextView
+        android:id="@+id/desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DESCRIPTION"
+        android:textColor="#C1C1C1"
+        android:textSize="15sp"
+        android:layout_marginTop="3dp" />
+
+    <!-- Location -->
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="India"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp" />
+
+    <!-- Bottom Icons -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:id="@+id/umbrella_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="16dp"
+            android:src="@mipmap/umbrella" />
+
+        <ImageView
+            android:id="@+id/warning_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="16dp"
+            android:src="@mipmap/warning" />
+
+        <ImageView
+            android:id="@+id/mask_icon"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@mipmap/mask" />
+    </LinearLayout>
+
+</LinearLayout>
