@@ -2,7 +2,7 @@
 
 <center>
   <a ><img alt='Flutter' src='https://img.shields.io/badge/Made_In Flutter-100000?style=for-the-badge&logo=Flutter&logoColor=white&labelColor=32C300&color=007CFF'/></a>
-<a href='https://play.google.com/store/apps/details?id=com.CPLLabs.weathery' target="_blank"><img alt='Google Play' src='https://img.shields.io/badge/Available_On PlayStore-100000?style=for-the-badge&logo=Google Play&logoColor=FFFFFF&labelColor=7912FF&color=FB7B3B'/></a>
+<a href='https://play.google.com/store/apps/details?id=com.CPLLabs.weathery' target="_blank"><img alt='Google Play' src='https://img.shields.io/badge/Available On Google PlayStore-414141?style=for-the-badge&logo=google-play&logoColor=white&labelColor=7912FF&color=FB7B3B'/></a>
 </center>
 
 ## About
