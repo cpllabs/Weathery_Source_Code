@@ -143,7 +143,7 @@ class _SearchBarState extends State<SearchBar> {
           templateType: TemplateType.medium,
           mainBackgroundColor: primaryForegroundColor,
           cornerRadius: 10),
-      adUnitId: "<AD_ID>",
+      adUnitId: "ca-app-pub-2238125462513134/9769120715",
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(

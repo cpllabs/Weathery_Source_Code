@@ -41,6 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
     await carrierObj.initPrefObj();
     await usernameObj.initPrefObj();
     bool data =  !(await Permission.ignoreBatteryOptimizations.status.isGranted);
+    print(data);
     setState(()  {
       morningSaved = carrierObj.getMorningSavedStatus();
       noonSaved = carrierObj.getNoonSavedStatus();
@@ -63,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
           templateType: TemplateType.small,
           mainBackgroundColor: primaryForegroundColor,
           cornerRadius: 10),
-      adUnitId: "<AD_ID>",
+      adUnitId: "ca-app-pub-2238125462513134/9769120715",
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(

@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Functionalities/localValues.dart';
 import 'package:weathery/Screens/mainScreen.dart';
@@ -91,14 +92,7 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
           },
           child: const Text("Allow"),
         ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(globalNavigatorKey.currentContext!,
-                    rootNavigator: true)
-                .pop();
-          },
-          child: const Text("Ignore :("),
-        ),
+
       ],
     );
   }
