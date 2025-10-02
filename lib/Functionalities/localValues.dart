@@ -40,10 +40,10 @@ List<String> nightMessages = [
 ];
 
 List<String> shareMessages = [
-  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nPowered By Weathery From https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
+  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
   "Check Out The Current Weather In %USERCITY, %USERCOUNTRY!\nPowered By Weathery @ https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
-  "Current Weather Conditions Of %USERCITY, %USERCOUNTRY\nPowered By Weathery From https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
-  "Current Weather At %USERCITY, %USERCOUNTRY\nPowered By Weathery From https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
+  "Current Weather Conditions Of %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
+  "Current Weather At %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
 ];
 
 class Greetings {
@@ -264,8 +264,8 @@ String analyzeTemperature(Map<String, dynamic> body) {
   return "Ranging From ${multiPurposeDescVar.reduce(min)}°C To ${multiPurposeDescVar.reduce(max)}°C";
 }
 
-String getShareMessage(city, country) {
+String getShareMessage(city, country, lat,long) {
   return shareMessages[Random().nextInt(shareMessages.length)]
       .replaceAll("%USERCITY", city)
-      .replaceAll("%USERCOUNTRY", country);
+      .replaceAll("%USERCOUNTRY", country).replaceAll("%LAT", lat).replaceAll("%LONG", long);
 }

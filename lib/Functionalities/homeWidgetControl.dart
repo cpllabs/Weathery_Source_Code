@@ -3,13 +3,18 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
-
 @pragma('vm:entry-point')
 void updateWidgetData(String iconPath, int temperature, String description,
     String location, bool showUmbrella, bool showMask, bool showWarning) async {
   await HomeWidget.saveWidgetData<String>(
       'temp', temperature.toString()); // Ensure int
-  await HomeWidget.saveWidgetData<String>('desc', description);
+  await HomeWidget.saveWidgetData<String>(
+      'desc',
+      description
+          .split(' ')
+          .map(
+              (word) => word[0].toUpperCase() + word.substring(1).toLowerCase())
+          .join(' '));
   await HomeWidget.saveWidgetData<String>("location", location);
   await HomeWidget.saveWidgetData<bool>('showUmbrellaIcon', showUmbrella);
   await HomeWidget.saveWidgetData<bool>('showMaskIcon', showMask);

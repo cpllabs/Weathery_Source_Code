@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl/intl.dart';
 // import 'package:ironsource_mediation/ironsource_mediation.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:weathery/APIKeys.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Functionalities/apiData.dart';
 import 'package:weathery/Screens/mainScreen.dart';
@@ -132,18 +132,19 @@ class _SearchBarState extends State<SearchBar> {
   void _loadNativeAd() {
     _nativeAd = NativeAd(
       nativeTemplateStyle: NativeTemplateStyle(
-          primaryTextStyle: NativeTemplateTextStyle(
-              textColor: Colors.white,
-              style: NativeTemplateFontStyle.bold,
-              size: 16.0),
-          secondaryTextStyle:
-              NativeTemplateTextStyle(textColor: Colors.grey, size: 12.0),
-          tertiaryTextStyle:
-              NativeTemplateTextStyle(textColor: Colors.grey, size: 10.0),
-          templateType: TemplateType.medium,
-          mainBackgroundColor: primaryForegroundColor,
-          cornerRadius: 10),
-      adUnitId: "ca-app-pub-2238125462513134/9769120715",
+        primaryTextStyle: NativeTemplateTextStyle(
+            textColor: Colors.white,
+            style: NativeTemplateFontStyle.bold,
+            size: 16.0),
+        secondaryTextStyle:
+            NativeTemplateTextStyle(textColor: Colors.grey, size: 12.0),
+        tertiaryTextStyle:
+            NativeTemplateTextStyle(textColor: Colors.grey, size: 10.0),
+        templateType: TemplateType.medium,
+        mainBackgroundColor: primaryForegroundColor,
+        cornerRadius: 10,
+      ),
+      adUnitId: ADMOB_APP_ID,
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(
@@ -156,9 +157,6 @@ class _SearchBarState extends State<SearchBar> {
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
           _nativeAd = null;
-          setState(() {
-            _isNativeAdLoaded = false;
-          });
           _loadNativeAd();
         },
       ),
@@ -391,7 +389,7 @@ class _SearchBarState extends State<SearchBar> {
                                   color: primaryForegroundColor,
                                   width: double
                                       .infinity, // Native ads usually take full width
-                                  height: 325,
+                                  height: 350,
 
                                   child: AdWidget(ad: _nativeAd!),
                                 )
@@ -722,13 +720,14 @@ String formatDate(String dateTimeString) {
 }
 
 void showInternetConnectionWarning() {
-  Fluttertoast.showToast(
-      msg: "Internet Not Available. Check Your Connection And Try Again",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: secondaryForegroundColor,
-      textColor: Colors.white,
-      fontSize: 16.0);
+  BuildContext? context = globalNavigatorKey.currentContext;
+  ScaffoldMessenger.of(context!).showSnackBar(
+    SnackBar(
+      duration: Duration(seconds: 5),
+      content:
+          Text("Internet Not Available. Check Your Connection And Try Again"),
+    ),
+  );
   // IronSource.hideBanner();
 }
 

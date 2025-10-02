@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weathery/APIKeys.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Functionalities/localValues.dart';
 import 'package:weathery/Screens/mainScreen.dart';
@@ -194,7 +195,7 @@ getWeather({lat, long, defaultCall = false}) async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$lat,$long&aqi=yes&alerts=yes&days=2');
+      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$lat,$long&aqi=yes&alerts=yes&days=2');
   var response;
 
   try {
@@ -311,7 +312,7 @@ void getWeatherFromName({city}) async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$city&aqi=yes&alerts=yes&days=2');
+      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$city&aqi=yes&alerts=yes&days=2');
   var response;
   try {
     response = await http.get(url);
@@ -348,7 +349,7 @@ Future<dynamic> searchlocationNames({str}) async {
   }
 
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/search.json?key=<API_KEY>&q=$str');
+      'https://api.weatherapi.com/v1/search.json?key=$WEATHERAPIKEY&q=$str');
   var response;
   try {
     response = await http.get(url);
@@ -464,7 +465,7 @@ Future<List> BackGroundWeather() async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=<API_KEY>&q=$positionCord&aqi=yes&alerts=yes&days=1');
+      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$positionCord&aqi=yes&alerts=yes&days=1');
   var response;
   try {
     response = await http.get(url);

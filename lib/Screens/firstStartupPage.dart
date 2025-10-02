@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/themeData.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class firstStartUp extends ConsumerWidget {
-
   final nameInpController = TextEditingController();
   firstStartUp({super.key}){}
 
@@ -102,13 +100,12 @@ class firstStartUp extends ConsumerWidget {
 
                       context.pushReplacement("/normal");
                     } else {
-                      Fluttertoast.showToast(
-                          msg: "Name Cannot Be Empty",
-                          toastLength: Toast.LENGTH_LONG,
-                          gravity: ToastGravity.TOP,
-                          backgroundColor: secondaryForegroundColor,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Name Cannot Be Empty"),
+                        ),
+                      );
                     }
                   },
                   child: const Row(

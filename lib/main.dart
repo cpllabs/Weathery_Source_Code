@@ -1,4 +1,5 @@
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Screens/AboutWidgetScreen.dart';
+import 'package:weathery/Screens/ErrorPage.dart';
 import 'package:weathery/Screens/aboutScreen.dart';
 import 'package:weathery/Functionalities/apiData.dart';
 import 'package:weathery/Screens/mainScreen.dart';
@@ -42,10 +44,7 @@ Future<void> main() async {
   try {
     await _cancelExistingAlarms();
     await _scheduleAlarms();
-  }on
-  Exception {
-
-  }
+  } on Exception {}
 
   await SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp],
@@ -54,6 +53,7 @@ Future<void> main() async {
   MobileAds.instance.initialize();
   await userName.initPrefObj();
   await favPost.initPrefObj();
+  AppLinks().uriLinkStream.listen((data) {});
   runApp(
     ProviderScope(
       overrides: [
@@ -74,6 +74,14 @@ Future<void> main() async {
               ),
             ),
             GoRoute(
+              path: '/error',
+              pageBuilder: (context, state) => _fadeTransition(
+                context,
+                state,
+                firstStartUp(),
+              ),
+            ),
+            GoRoute(
               path: '/normal',
               pageBuilder: (context, state) => _fadeTransition(
                 context,
@@ -81,6 +89,18 @@ Future<void> main() async {
                 NormalStartUp(),
               ),
             ),
+            GoRoute(
+                path: '/weathery/:lat/:long',
+                pageBuilder: (context, state) {
+                  getWeather(
+                      lat: state.pathParameters['lat'],
+                      long: state.pathParameters['long']);
+                  return _fadeTransition(
+                    context,
+                    state,
+                    (userName.getName() == null) ? firstStartUp() : NormalStartUp(),
+                  );
+                }),
             GoRoute(
               path: '/main',
               pageBuilder: (context, state) => _fadeTransition(
@@ -114,6 +134,11 @@ Future<void> main() async {
               ),
             ),
           ],
+          errorPageBuilder: (context, state) => _fadeTransition(
+            context,
+            state,
+            (userName.getName() == null) ? firstStartUp() : ErrorPage(),
+          ),
         ),
       ),
     ),
@@ -130,7 +155,6 @@ Future<void> _cancelExistingAlarms() async {
 }
 
 Future<void> _scheduleAlarms() async {
-
   await AndroidAlarmManager.periodic(
     const Duration(days: 1),
     0,

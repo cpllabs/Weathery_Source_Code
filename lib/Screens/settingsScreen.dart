@@ -4,11 +4,11 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:weathery/APIKeys.dart';
 import 'package:weathery/Functionalities/localValues.dart';
 import 'package:weathery/semiWidgets.dart';
 import '../themeData.dart';
@@ -40,9 +40,8 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadNativeAd();
     await carrierObj.initPrefObj();
     await usernameObj.initPrefObj();
-    bool data =  !(await Permission.ignoreBatteryOptimizations.status.isGranted);
-    print(data);
-    setState(()  {
+    bool data = !(await Permission.ignoreBatteryOptimizations.status.isGranted);
+    setState(() {
       morningSaved = carrierObj.getMorningSavedStatus();
       noonSaved = carrierObj.getNoonSavedStatus();
       nightSaved = carrierObj.getNightSavedStatus();
@@ -64,7 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
           templateType: TemplateType.small,
           mainBackgroundColor: primaryForegroundColor,
           cornerRadius: 10),
-      adUnitId: "ca-app-pub-2238125462513134/9769120715",
+      adUnitId: ADMOB_APP_ID,
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(
@@ -77,9 +76,6 @@ class _SettingsPageState extends State<SettingsPage> {
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
           _nativeAd = null;
-          setState(() {
-            _isNativeLoaded = false;
-          });
           _loadNativeAd();
         },
       ),
@@ -131,7 +127,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         borderSide: BorderSide(
                             color: secondaryForegroundColor, width: 3),
                         borderRadius:
-                            const BorderRadius.all(Radius.circular(50))),
+                            const BorderRadius.all(Radius.circular(10))),
                     prefixIcon: const Icon(Icons.person),
                     prefixIconColor: MaterialStateColor.resolveWith(
                         (Set<MaterialState> states) {
@@ -159,21 +155,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     onPressed: () {
                       if (nameInpController.text.isNotEmpty) {
                         usernameObj.setName(nameInpController.text);
-                        Fluttertoast.showToast(
-                            msg: "Name Updated Successfully",
-                            toastLength: Toast.LENGTH_LONG,
-                            gravity: ToastGravity.TOP,
-                            backgroundColor: secondaryForegroundColor,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(
+                            "Name Updated Successfully",
+                          )),
+                        );
                       } else {
-                        Fluttertoast.showToast(
-                            msg: "Name Cannot Be Empty",
-                            toastLength: Toast.LENGTH_LONG,
-                            gravity: ToastGravity.TOP,
-                            backgroundColor: secondaryForegroundColor,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Name Cannot Be Empty"),
+                          ),
+                        );
                       }
                     },
                     color: buttonColor,
@@ -337,8 +330,9 @@ class _SettingsPageState extends State<SettingsPage> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
                           onPressed: () async {
-                            AppSettings.openAppSettings(type: AppSettingsType.batteryOptimization, );
-
+                            AppSettings.openAppSettings(
+                              type: AppSettingsType.batteryOptimization,
+                            );
                           },
                           color: buttonColor,
                           child: const Text(

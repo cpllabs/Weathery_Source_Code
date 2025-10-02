@@ -135,7 +135,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               mimeType: "image/png",
               name: "WeatherDetails_${DateTime.now()}.png")
         ],
-        text: getShareMessage(userCity, userCountry),
+        text: getShareMessage(userCity, userCountry, posLat, posLong),
       );
     } catch (e) {
     } finally {
