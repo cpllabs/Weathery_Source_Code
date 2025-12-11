@@ -36,17 +36,18 @@ class AboutPage extends StatelessWidget {
                   style: headingStyle,
                 ),
                 const SizedBox(
+
                   height: 10,
                 ),
                 Text(
-                  "Version : 2.1.0",
+                  "Version : 2.7.5",
                   style: captionStyle,
                 ),
                 const SizedBox(
                   height: 25,
                 ),
                 Text(
-                  "Weathery is a Weather App built with Flutter using Weather.com API which "
+                  "Weathery is a Weather App built with Flutter using WeatherAPI.com API which "
                   "provides weather updates and alerts to users. Weathery filters out unnecessary "
                   "information that don't matter to normal people",
                   style:

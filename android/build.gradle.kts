@@ -1,28 +1,14 @@
-buildscript {
-//    ext.kotlin_version = ""
+plugins {
+    id("com.android.application") apply false
+    id("org.jetbrains.kotlin.android") apply false
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
+}
+
+allprojects {
     repositories {
         google()
         mavenCentral()
         maven(url = "https://jitpack.io")
-    }
-
-    dependencies {
-        classpath("com.android.tools.build:gradle:4.2.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0")
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
     }
 }
 

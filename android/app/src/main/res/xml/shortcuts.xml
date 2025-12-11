@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <capability android:name="actions.intent.GET_THING">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.CPLLabs.weathery"
+            android:targetClass="com.CPLLabs.weathery.MainActivity">
+            <url-template android:value="weathery://app/viaAssistant?q={name}" />
+            <parameter android:name="thing.name" android:key="name" />
+        </intent>
+    </capability>
+
+    <capability android:name="actions.intent.SEARCH_IN_APP">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.CPLLabs.weathery"
+            android:targetClass="com.CPLLabs.weathery.MainActivity">
+
+            <url-template android:value="weathery://app/viaAssistant?q={query}" />
+
+            <parameter android:name="query" android:key="query" />
+        </intent>
+    </capability>
+
+</shortcuts>

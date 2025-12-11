@@ -4,10 +4,11 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("dev.flutter.flutter-gradle-plugin")
 }
+
 
 val keystoreProperties = Properties().apply {
     val keystoreFile = rootProject.file("keystore.properties")
@@ -67,9 +68,10 @@ android {
 //            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
         getByName("release") {
-            isShrinkResources = false  // Instead of shrinkResources false
+            isShrinkResources = true  // Instead of shrinkResources false
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
@@ -98,4 +100,5 @@ dependencies {
 
     // Required when using custom native ad implementation
     implementation("com.unity3d.ads-mediation:mediation-sdk:8.6.1")
+    implementation("com.google.ads.mediation:facebook:6.20.0.2")
 }

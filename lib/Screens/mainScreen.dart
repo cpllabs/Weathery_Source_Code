@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:icons_plus/icons_plus.dart';
 // import 'package:ironsource_mediation/ironsource_mediation.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,6 +31,7 @@ String userCountry = '',
     rainDesc = "",
     pressureC = "",
     AQI = "",
+    UV = "",
     AQIDesc = "",
     bgimage = '',
     posLat = '',
@@ -46,6 +48,7 @@ void setWeatherData(
     iconPathWithoutAPI,
     pressure,
     rainData,
+    uv,
     changeFirstTime}) {
   tempCurrent = temp;
   descCurrent = desc;
@@ -53,6 +56,7 @@ void setWeatherData(
   icon = iconPathWithoutAPI;
   pressureC = pressure;
   rainInfo = rainData;
+  UV = uv;
   if (changeFirstTime) {
     notFirstTime = true;
   }
@@ -94,16 +98,20 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     });
   }
 
-  void _showAdvisoryDialog(BuildContext context,SharedPreferencesAsync sharedPrefObj) {
+  void _showAdvisoryDialog(
+      BuildContext context, SharedPreferencesAsync sharedPrefObj) {
     alertUser(
-      title: Text("Final Request", style: headingStyle.copyWith(fontSize: 20),),
+      title: Text(
+        "Final Request",
+        style: headingStyle.copyWith(fontSize: 20),
+      ),
       content: Text(
-          "Please Allow Battery Optimization Setting To Ensure Timely And Correct Delivery Of Notifications and Widget Updates!",
+        "Please Allow Battery Optimization Setting To Ensure Timely And Correct Delivery Of Notifications and Widget Updates!",
         style: captionStyle.copyWith(fontSize: 18),
       ),
       actions: [
         ElevatedButton(
-          onPressed: () async{
+          onPressed: () async {
             Navigator.pop(context);
             context.go("/settings");
             await sharedPrefObj.setBool("NoAdvisory", false);
@@ -111,7 +119,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           child: const Text("Open Settings"),
         ),
         ElevatedButton(
-          onPressed: () async{
+          onPressed: () async {
             Navigator.pop(context);
             await sharedPrefObj.setBool("NoAdvisory", false);
           },
@@ -178,10 +186,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           ),
           SizedBox(
             width: 40,
-            child: MaterialButton(
-              padding: EdgeInsets.zero,
+            child: InkWell(
               focusColor: primaryBackgroundColor,
-              onPressed: () {
+              onTap: () {
                 // IronSource.displayBanner();
                 getCurrentLocation();
                 alertUser(
@@ -269,9 +276,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                       padding: EdgeInsets.zero,
                                       splashColor: secondaryForegroundColor,
                                       onPressed: () {
-                                        // IronSource.displayBanner();
-                                        getWeatherFromName(
-                                            city: "$posLat,$posLong");
+                                        getWeather(lat: posLat, long: posLong);
                                         alertUser(
                                             title: const SizedBox(
                                               height: 0,
@@ -400,6 +405,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           ],
                         ),
                       ),
+                     
                       Row(
                         //Rain and AQI
                         children: [
@@ -501,6 +507,59 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      InkWell(
+                        onTap: () {
+                          context.push(
+                              "/clothing/$tempCurrent/$descCurrent/$UV/$AQI");
+                        },
+                        child: Container(
+                          //Dress Code
+                          height: 120,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                            color: primaryForegroundColor,
+                          ),
+                          margin: const EdgeInsets.only(
+                            top: 15,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Styling Guide",
+                                    style: headingStyle.copyWith(fontSize: 25),
+                                  ),
+                                  Text(
+                                    "What To Wear Based On\nCurrent Weather Conditions",
+                                    style: TextStyle(color: secondaryTextColor),
+                                    textAlign: TextAlign.center,
+                                  )
+                                ],
+                              ),
+                              Row(
+                                spacing: 20,
+                                children: [
+                                  Image.asset(
+                                    "assets/cloth.png",
+                                    scale: 1.25,
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_sharp,
+                                    size: 25,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                       Container(
                           //Forecast

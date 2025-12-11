@@ -18,6 +18,7 @@
 }
 
 -keep class com.dexterous.flutterlocalnotifications.** { *; }
+-keep class com.CPLLabs.weathery.MainActivity { *; }
 -keep class **.R$drawable { public static <fields>; }
 
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallException
@@ -30,6 +31,13 @@
 -dontwarn com.google.android.play.core.tasks.OnFailureListener
 -dontwarn com.google.android.play.core.tasks.OnSuccessListener
 -dontwarn com.google.android.play.core.tasks.Task
+
+# Keep Facebook/Meta Audience Network classes safe from R8
+-dontwarn com.facebook.infer.annotation.**
+-dontwarn com.facebook.ads.internal.**
+-keep class com.facebook.ads.** { *; }
+-keep class com.facebook.infer.** { *; }
+
 # Prevent ProGuard from Obfuscating Method Signatures
 -keepattributes *Annotation*
 -keepclassmembers class ** { @android.webkit.JavascriptInterface <methods>; }

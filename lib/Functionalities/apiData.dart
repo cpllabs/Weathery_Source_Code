@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,6 +11,7 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weathery/APIKeys.dart';
+import 'package:weathery/Functionalities/CacheManager.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Functionalities/localValues.dart';
 import 'package:weathery/Screens/mainScreen.dart';
@@ -44,13 +46,11 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
           },
           child: const Text("Open Settings"),
         ),
-
-          ElevatedButton(
-              onPressed: () {
-                SystemNavigator.pop();
-              },
-              child: const Text("Quit"))
-
+        ElevatedButton(
+            onPressed: () {
+              SystemNavigator.pop();
+            },
+            child: const Text("Quit"))
       ],
     );
   } else if (permission != LocationPermission.always) {
@@ -66,7 +66,6 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
             await Geolocator.requestPermission();
             permission = await Geolocator.checkPermission();
             if (permission != LocationPermission.always) {
-
               Navigator.of(globalNavigatorKey.currentContext!,
                       rootNavigator: true)
                   .pop();
@@ -93,137 +92,144 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
           },
           child: const Text("Allow"),
         ),
-
       ],
     );
-  }
+  } else {
+    if (!(await Permission.scheduleExactAlarm.isGranted)) {
+      alertUserAsync(
+        title: const Text(
+            "Schedule Exact Alarm Required For Notifications and Widget"),
+        content: Text(
+          "Schedule Exact Alarm Setting is required in order to get precise weather details in background to update widget and send update notifications!",
+          style: captionStyle.copyWith(fontSize: 18),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              await Permission.scheduleExactAlarm.request();
+              if (await Permission.scheduleExactAlarm.isGranted) {
+                Navigator.of(globalNavigatorKey.currentContext!,
+                        rootNavigator: true)
+                    .pop();
+              }
+              FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+                  FlutterLocalNotificationsPlugin();
+              flutterLocalNotificationsPlugin
+                  .resolvePlatformSpecificImplementation<
+                      AndroidFlutterLocalNotificationsPlugin>()
+                  ?.requestNotificationsPermission();
 
-  else {
-   if (!(await Permission.scheduleExactAlarm.isGranted)){
-     alertUserAsync(
-       title: const Text(
-           "Schedule Exact Alarm Required For Notifications and Widget"),
-       content: Text(
-         "Schedule Exact Alarm Setting is required in order to get precise weather details in background to update widget and send update notifications!",
-         style: captionStyle.copyWith(fontSize: 18),
-       ),
-       actions: [
-         ElevatedButton(
-           onPressed: () async {
-             await Permission.scheduleExactAlarm.request();
-             if (await Permission.scheduleExactAlarm.isGranted) {
-               Navigator.of(globalNavigatorKey.currentContext!,
-                   rootNavigator: true)
-                   .pop();
-             }
-             FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-             FlutterLocalNotificationsPlugin();
-             flutterLocalNotificationsPlugin
-                 .resolvePlatformSpecificImplementation<
-                 AndroidFlutterLocalNotificationsPlugin>()
-                 ?.requestNotificationsPermission();
+              Position position = await Geolocator.getCurrentPosition(
+                  locationSettings:
+                      AndroidSettings(accuracy: LocationAccuracy.medium));
 
-             Position position = await Geolocator.getCurrentPosition(
-                 locationSettings: AndroidSettings(accuracy: LocationAccuracy.medium));
+              double lat = position.latitude;
+              double long = position.longitude;
 
-             double lat = position.latitude;
-             double long = position.longitude;
+              var locationObj = Location();
+              await locationObj.initPrefObj();
+              locationObj.setLoaction(lat, long);
+              getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
+            },
+            child: const Text("Allow"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(globalNavigatorKey.currentContext!,
+                      rootNavigator: true)
+                  .pop();
+              FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+                  FlutterLocalNotificationsPlugin();
+              flutterLocalNotificationsPlugin
+                  .resolvePlatformSpecificImplementation<
+                      AndroidFlutterLocalNotificationsPlugin>()
+                  ?.requestNotificationsPermission();
 
-             var locationObj = Location();
-             await locationObj.initPrefObj();
-             locationObj.setLoaction(lat, long);
-             getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
-           },
-           child: const Text("Allow"),
-         ),
-         ElevatedButton(
-           onPressed: () async{
-             Navigator.of(globalNavigatorKey.currentContext!,
-                 rootNavigator: true)
-                 .pop();
-             FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-             FlutterLocalNotificationsPlugin();
-             flutterLocalNotificationsPlugin
-                 .resolvePlatformSpecificImplementation<
-                 AndroidFlutterLocalNotificationsPlugin>()
-                 ?.requestNotificationsPermission();
+              Position position = await Geolocator.getCurrentPosition(
+                  locationSettings:
+                      AndroidSettings(accuracy: LocationAccuracy.medium));
 
-             Position position = await Geolocator.getCurrentPosition(
-                 locationSettings: AndroidSettings(accuracy: LocationAccuracy.medium));
+              double lat = position.latitude;
+              double long = position.longitude;
 
-             double lat = position.latitude;
-             double long = position.longitude;
+              var locationObj = Location();
+              await locationObj.initPrefObj();
+              locationObj.setLoaction(lat, long);
+              getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
+            },
+            child: const Text("Ignore :("),
+          ),
+        ],
+      );
+    } else {
+      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+          FlutterLocalNotificationsPlugin();
+      flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.requestNotificationsPermission();
 
-             var locationObj = Location();
-             await locationObj.initPrefObj();
-             locationObj.setLoaction(lat, long);
-             getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
-           },
-           child: const Text("Ignore :("),
-         ),
-       ],
-     );
+      Position position = await Geolocator.getCurrentPosition(
+          locationSettings: AndroidSettings(accuracy: LocationAccuracy.medium));
 
-   }
-  else{
-     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-     FlutterLocalNotificationsPlugin();
-     flutterLocalNotificationsPlugin
-         .resolvePlatformSpecificImplementation<
-         AndroidFlutterLocalNotificationsPlugin>()
-         ?.requestNotificationsPermission();
+      double lat = position.latitude;
+      double long = position.longitude;
 
-     Position position = await Geolocator.getCurrentPosition(
-         locationSettings: AndroidSettings(accuracy: LocationAccuracy.medium));
-
-     double lat = position.latitude;
-     double long = position.longitude;
-
-     var locationObj = Location();
-     await locationObj.initPrefObj();
-     locationObj.setLoaction(lat, long);
-     getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
-   }
+      var locationObj = Location();
+      await locationObj.initPrefObj();
+      locationObj.setLoaction(lat, long);
+      getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
+    }
   }
 }
 
 getWeather({lat, long, defaultCall = false}) async {
-  bool result = await InternetConnectionChecker.instance.hasConnection;
-  if (result == false) {
-    showInternetConnectionWarning();
-    return;
-  }
   Map<String, dynamic> body = {};
-  Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$lat,$long&aqi=yes&alerts=yes&days=2');
-  var response;
+  print(lat+long);
+  if (CacheManager.instance.getWeather('$lat;$long') != null) {
+    print(("SENDING CACHE"));
+    await Future.delayed(1.seconds);
+    body = CacheManager.instance.getWeather('$lat;$long')
+        as Map<String, dynamic>;
+  } else {
+    bool result = await InternetConnectionChecker.instance.hasConnection;
+    if (result == false) {
+      showInternetConnectionWarning();
+      return;
+    }
 
-  try {
-    response = await http.get(url);
-  } on SocketException {
-    showInternetConnectionWarning();
-    return;
-  }
-  try {
-    body = jsonDecode(response.body);
-  } on FormatException {
-    alertUser(
-      title: const Center(child: Text("Service Unavailable")),
-      content: const Text(
-          "WeatherAPI is currently facing issues.\nPlease try after some time"),
-      actions: [
-        ElevatedButton(
-            onPressed: () {
-              SystemNavigator.pop();
-            },
-            child: const Text("Quit"))
-      ],
-    );
-  }
+    Uri url = Uri.parse(
+        'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$lat,$long&aqi=yes&alerts=yes&days=2');
+    var response;
+    try {
+      response = await http.get(url);
+    } on SocketException {
+      showInternetConnectionWarning();
+      return;
+    }
+    try {
+      body = jsonDecode(response.body);
+      CacheManager.instance.saveWeather('$lat;$long', body);
+      CacheManager.instance.saveWeather('${body['location']["lat"].toString()};${body['location']["lon"].toString()}', body);
+    } on FormatException {
+      alertUser(
+        title: const Center(child: Text("Service Unavailable")),
+        content: const Text(
+            "WeatherAPI is currently facing issues.\nPlease try after some time"),
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                SystemNavigator.pop();
+              },
+              child: const Text("Quit"))
+        ],
+      );
 
+      return;
+    }
+  }
   if (defaultCall) {
     setData(body, true);
-
     updateWidgetData(
         body["current"]["condition"]["icon"].toString().substring(21),
         body["current"]["temp_c"]!.round(),
@@ -247,7 +253,6 @@ void setData(var body, bool notFirstTime) async {
   );
   posLat = body['location']["lat"].toString();
   posLong = body['location']["lon"].toString();
-
   var rainvalue = body["current"]['precip_mm'];
   var descOfRain;
   if (rainvalue == 0) {
@@ -288,6 +293,7 @@ void setData(var body, bool notFirstTime) async {
   setRainInfo(measure: rainvalue, desc: descOfRain);
 
   setWeatherData(
+      uv: body["current"]["uv"].toString(),
       rainData: analyzeWeather(body),
       temp: body["current"]["temp_c"].toString(),
       desc: body["current"]["condition"]["text"],
@@ -306,38 +312,48 @@ void setData(var body, bool notFirstTime) async {
 }
 
 void getWeatherFromName({city}) async {
-  bool result = await InternetConnectionChecker.instance.hasConnection;
-  if (result == false) {
-    showInternetConnectionWarning();
-  }
-  Map<String, dynamic> body = {};
-  Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$city&aqi=yes&alerts=yes&days=2');
-  var response;
-  try {
-    response = await http.get(url);
-  } on SocketException {
-    showInternetConnectionWarning();
-    return;
-  }
-  try {
-    body = jsonDecode(response.body);
-  } catch (e) {
-    if (e == FormatException) {
-      alertUser(
-        title: const Center(child: Text("Service Unavailable")),
-        content: const Text(
-            "WeatherAPI is currently facing issues.\nPlease try after some time"),
-        actions: [
-          ElevatedButton(
-              onPressed: () {
-                SystemNavigator.pop();
-              },
-              child: const Text("Quit"))
-        ],
-      );
+  Map<String, dynamic> body;
+  if (CacheManager.instance.getWeather(city) != null) {
+    await Future.delayed(1.seconds);
+    body =
+    (CacheManager.instance.getWeather(city)) as Map<String, dynamic>;
+  } else {
+    bool result = await InternetConnectionChecker.instance.hasConnection;
+    if (result == false) {
+      showInternetConnectionWarning();
+      return;
+    }
+    Uri url = Uri.parse(
+        'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$city&aqi=yes&alerts=yes&days=2');
+    var response;
+    try {
+      response = await http.get(url);
+    } on SocketException {
+      showInternetConnectionWarning();
+      return;
+    }
+    try {
+      body = jsonDecode(response.body);
+      CacheManager.instance.saveWeather('$city', body);
+    } catch (e) {
+      if (e == FormatException) {
+        alertUser(
+          title: const Center(child: Text("Service Unavailable")),
+          content: const Text(
+              "WeatherAPI is currently facing issues.\nPlease try after some time"),
+          actions: [
+            ElevatedButton(
+                onPressed: () {
+                  SystemNavigator.pop();
+                },
+                child: const Text("Quit"))
+          ],
+        );
+      }
+      return;
     }
   }
+
   setData(body, false);
 }
 
@@ -353,7 +369,7 @@ Future<dynamic> searchlocationNames({str}) async {
   var response;
   try {
     response = await http.get(url);
-  } on SocketException  {
+  } on SocketException {
     showInternetConnectionWarning();
     return;
   }
@@ -442,7 +458,6 @@ Future<List> BackGroundWeather() async {
       );
       positionCord = "${position.latitude},${position.longitude}";
     } catch (_) {
-
       try {
         Position? position = await Geolocator.getLastKnownPosition().timeout(
           const Duration(seconds: 20), // Overall timeout for the Future
@@ -458,7 +473,6 @@ Future<List> BackGroundWeather() async {
       }
     }
   } else {
-
     var locObj = Location();
     await locObj.initPrefObj();
     positionCord = locObj.getLastKnowLocation();
@@ -474,7 +488,7 @@ Future<List> BackGroundWeather() async {
   }
   try {
     body = jsonDecode(response.body);
-  } on FormatException  {
+  } on FormatException {
     return [];
   }
   out.add(analyzeTemperature(body));
@@ -508,12 +522,10 @@ Future<void> MorningMessage() async {
 
 @pragma('vm:entry-point')
 Future NoonMessage() async {
-
   var obj = NotificationSettings();
   await obj.initPrefObj();
 
   if (obj.getNoonSavedStatus()) {
-
     List weatherInfo =
         await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
 
@@ -562,5 +574,4 @@ Future UpdateWidgetBackground({passedWeatherInfo}) async {
       !(weatherInfo[1].isEmpty),
       weatherInfo[6],
       weatherInfo[4] > 0);
-
 }

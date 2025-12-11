@@ -71,7 +71,6 @@ class UserName {
   Future initPrefObj() async {
     WidgetsFlutterBinding.ensureInitialized();
     prefObj = await SharedPreferences.getInstance();
-
   }
 
   void setName(String inputName) {
@@ -109,7 +108,6 @@ class Location {
   }
 }
 
-
 class FavouriteLocations {
   var prefObj;
 
@@ -119,15 +117,16 @@ class FavouriteLocations {
     return prefObj;
   }
 
-  void setLoaction(int slot, String lat,long,placeName,stateName,countryName) {
+  void setLoaction(
+      int slot, String lat, long, placeName, stateName, countryName) {
     _saveFavLocation(slot, "$placeName,$stateName,$countryName,$lat,$long");
   }
 
-  void deleteFavLocation(int locNum){
+  void deleteFavLocation(int locNum) {
     _deleteFavLocation(locNum);
   }
 
-  void _deleteFavLocation(int locNum) async{
+  void _deleteFavLocation(int locNum) async {
     await prefObj.remove('favLocation$locNum');
   }
 
@@ -264,8 +263,10 @@ String analyzeTemperature(Map<String, dynamic> body) {
   return "Ranging From ${multiPurposeDescVar.reduce(min)}°C To ${multiPurposeDescVar.reduce(max)}°C";
 }
 
-String getShareMessage(city, country, lat,long) {
+String getShareMessage(city, country, lat, long) {
   return shareMessages[Random().nextInt(shareMessages.length)]
       .replaceAll("%USERCITY", city)
-      .replaceAll("%USERCOUNTRY", country).replaceAll("%LAT", lat).replaceAll("%LONG", long);
+      .replaceAll("%USERCOUNTRY", country)
+      .replaceAll("%LAT", lat)
+      .replaceAll("%LONG", long);
 }

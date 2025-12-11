@@ -381,6 +381,7 @@ class _SearchBarState extends State<SearchBar> {
                             color: secondaryTextColor,
                           ),
                           Column(
+                            spacing: 5,
                             children: suggestions,
                           ),
                           _isNativeAdLoaded
@@ -529,6 +530,9 @@ class _SideNavBarState extends State<SideNavBar> {
             NavBarItem(Icons.question_mark_outlined, "About", () {
               context.go("/about");
             }),
+            const SizedBox(
+              height: 5,
+            ),
             NavBarItem(Icons.settings, "Settings", () {
               context.go("/settings");
             }),
@@ -543,15 +547,11 @@ class _SideNavBarState extends State<SideNavBar> {
             ),
             NavBarItem(Icons.privacy_tip_sharp, "Privacy Policy", () {
               launchUrlString(
-                  "https://aryanshdev.github.io/Weathery/privacy.html",
+                  "https://aryanshdev.in/privacy",
                   mode: LaunchMode.externalApplication);
             }),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              height: 50, // Adjust ad container height as needed
-            ),
+
+
           ],
         ),
       ),
