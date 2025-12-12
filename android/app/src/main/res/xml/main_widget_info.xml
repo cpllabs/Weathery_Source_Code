@@ -7,5 +7,5 @@
     android:maxResizeHeight="220dp"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/widget_main"
-    android:resizeMode="vertical"
+    android:resizeMode="none"
     android:widgetCategory="home_screen" />
