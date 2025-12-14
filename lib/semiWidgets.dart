@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -144,7 +145,7 @@ class _SearchBarState extends State<SearchBar> {
         mainBackgroundColor: primaryForegroundColor,
         cornerRadius: 10,
       ),
-      adUnitId: ADMOB_APP_ID,
+      adUnitId: MEDIATED_UNIT_ID,
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(
@@ -154,9 +155,10 @@ class _SearchBarState extends State<SearchBar> {
             _isNativeAdLoaded = true;
           });
         },
-        onAdFailedToLoad: (ad, error) {
+        onAdFailedToLoad: (ad, error) async{
           ad.dispose();
           _nativeAd = null;
+          await Future.delayed(1.seconds);
           _loadNativeAd();
         },
       ),
@@ -381,17 +383,21 @@ class _SearchBarState extends State<SearchBar> {
                             color: secondaryTextColor,
                           ),
                           Column(
+                            spacing: 5,
                             children: suggestions,
                           ),
                           _isNativeAdLoaded
                               ? Container(
-                                  margin: EdgeInsets.only(top: 15),
-                                  color: primaryForegroundColor,
-                                  width: double
-                                      .infinity, // Native ads usually take full width
-                                  height: 350,
+                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                              color: primaryForegroundColor,
+                            ),
+                            height: 355,
 
-                                  child: AdWidget(ad: _nativeAd!),
+                            child: AdWidget(ad: _nativeAd!),
                                 )
                               : Container(),
                         ],
@@ -529,6 +535,9 @@ class _SideNavBarState extends State<SideNavBar> {
             NavBarItem(Icons.question_mark_outlined, "About", () {
               context.go("/about");
             }),
+            const SizedBox(
+              height: 5,
+            ),
             NavBarItem(Icons.settings, "Settings", () {
               context.go("/settings");
             }),
@@ -543,15 +552,11 @@ class _SideNavBarState extends State<SideNavBar> {
             ),
             NavBarItem(Icons.privacy_tip_sharp, "Privacy Policy", () {
               launchUrlString(
-                  "https://aryanshdev.github.io/Weathery/privacy.html",
+                  "https://aryanshdev.in/privacy",
                   mode: LaunchMode.externalApplication);
             }),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              height: 50, // Adjust ad container height as needed
-            ),
+
+
           ],
         ),
       ),

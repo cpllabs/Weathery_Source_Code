@@ -40,10 +40,10 @@ List<String> nightMessages = [
 ];
 
 List<String> shareMessages = [
-  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
-  "Check Out The Current Weather In %USERCITY, %USERCOUNTRY!\nPowered By Weathery @ https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
+  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nView Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
+  "Check Out The Current Weather In %USERCITY, %USERCOUNTRY!\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
   "Current Weather Conditions Of %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
-  "Current Weather At %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
+  "Current Weather At %USERCITY, %USERCOUNTRY\nCheck Out At : https://aryanshdev.github.io/weathery/%LAT/%LONG",
 ];
 
 class Greetings {
@@ -71,7 +71,6 @@ class UserName {
   Future initPrefObj() async {
     WidgetsFlutterBinding.ensureInitialized();
     prefObj = await SharedPreferences.getInstance();
-
   }
 
   void setName(String inputName) {
@@ -109,7 +108,6 @@ class Location {
   }
 }
 
-
 class FavouriteLocations {
   var prefObj;
 
@@ -119,15 +117,16 @@ class FavouriteLocations {
     return prefObj;
   }
 
-  void setLoaction(int slot, String lat,long,placeName,stateName,countryName) {
+  void setLoaction(
+      int slot, String lat, long, placeName, stateName, countryName) {
     _saveFavLocation(slot, "$placeName,$stateName,$countryName,$lat,$long");
   }
 
-  void deleteFavLocation(int locNum){
+  void deleteFavLocation(int locNum) {
     _deleteFavLocation(locNum);
   }
 
-  void _deleteFavLocation(int locNum) async{
+  void _deleteFavLocation(int locNum) async {
     await prefObj.remove('favLocation$locNum');
   }
 
@@ -264,8 +263,10 @@ String analyzeTemperature(Map<String, dynamic> body) {
   return "Ranging From ${multiPurposeDescVar.reduce(min)}°C To ${multiPurposeDescVar.reduce(max)}°C";
 }
 
-String getShareMessage(city, country, lat,long) {
+String getShareMessage(city, country, lat, long) {
   return shareMessages[Random().nextInt(shareMessages.length)]
       .replaceAll("%USERCITY", city)
-      .replaceAll("%USERCOUNTRY", country).replaceAll("%LAT", lat).replaceAll("%LONG", long);
+      .replaceAll("%USERCOUNTRY", country)
+      .replaceAll("%LAT", lat)
+      .replaceAll("%LONG", long);
 }

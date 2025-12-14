@@ -7,16 +7,16 @@ import '../Functionalities/apiData.dart';
 import 'package:flutter/material.dart';
 import '../themeData.dart';
 
-class NormalStartUp extends ConsumerStatefulWidget {
-  NormalStartUp({Key? key}) : super(key: key) {
-    getCurrentLocation(defaultCallCheck: true);
+class NormalStartUpLoaderScreen extends ConsumerStatefulWidget {
+  NormalStartUpLoaderScreen({Key? key}) : super(key: key) {
+
   }
 
   @override
   _NormalStartUpState createState() => _NormalStartUpState();
 }
 
-class _NormalStartUpState extends ConsumerState<NormalStartUp> {
+class _NormalStartUpState extends ConsumerState<NormalStartUpLoaderScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,6 @@ class _NormalStartUpState extends ConsumerState<NormalStartUp> {
         child: Center(
           child: Container(
             decoration: BoxDecoration(
-              color: primaryForegroundColor,
               borderRadius: BorderRadius.circular(10.0),
             ),
             margin: EdgeInsets.only(right: 30, left: 30),

@@ -4,10 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weathery/Functionalities/CacheManager.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Screens/AboutWidgetScreen.dart';
+import 'package:weathery/Screens/Clothing.dart';
 import 'package:weathery/Screens/ErrorPage.dart';
 import 'package:weathery/Screens/aboutScreen.dart';
 import 'package:weathery/Functionalities/apiData.dart';
@@ -40,20 +44,14 @@ final globalNavigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AndroidAlarmManager.initialize();
-  try {
-    await _cancelExistingAlarms();
-    await _scheduleAlarms();
-  } on Exception {}
-
   await SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp],
   );
 
-  MobileAds.instance.initialize();
   await userName.initPrefObj();
   await favPost.initPrefObj();
-  AppLinks().uriLinkStream.listen((data) {});
+  await CacheManager.instance.init();
+  await CacheManager.instance.clearAll();
   runApp(
     ProviderScope(
       overrides: [
@@ -82,13 +80,42 @@ Future<void> main() async {
               ),
             ),
             GoRoute(
-              path: '/normal',
-              pageBuilder: (context, state) => _fadeTransition(
-                context,
-                state,
-                NormalStartUp(),
-              ),
+              path: '/clothing/:temp/:desc/:uv/:aqi',
+              pageBuilder: (context, state) {
+                return CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: ClothingScreen(
+                      aqi: int.parse(state.pathParameters['aqi']!),
+                      uv: double.parse(state.pathParameters['uv'].toString())
+                          .round(),
+                      temp: double.parse(state.pathParameters['temp']!),
+                      desc: state.pathParameters['desc']!),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    const begin = Offset(0.0, 1.0); // Start from bottom
+                    const end = Offset.zero; // End at current position
+                    const curve = Curves.easeOut;
+
+                    var tween = Tween(
+                      begin: begin,
+                      end: end,
+                    ).chain(CurveTween(curve: curve));
+
+                    return SlideTransition(
+                      position: animation.drive(tween),
+                      child: child,
+                    );
+                  },
+                );
+              },
             ),
+            GoRoute(
+                path: '/normal',
+                pageBuilder: (context, state) {
+                  getCurrentLocation(defaultCallCheck: true);
+                  return _fadeTransition(
+                      context, state, NormalStartUpLoaderScreen());
+                }),
             GoRoute(
                 path: '/weathery/:lat/:long',
                 pageBuilder: (context, state) {
@@ -98,9 +125,29 @@ Future<void> main() async {
                   return _fadeTransition(
                     context,
                     state,
-                    (userName.getName() == null) ? firstStartUp() : NormalStartUp(),
+                    (userName.getName() == null)
+                        ? firstStartUp()
+                        : NormalStartUpLoaderScreen(),
                   );
                 }),
+            GoRoute(
+              path: '/viaAssistant',
+              pageBuilder: (context, state) {
+                final String? cityName = state.uri.queryParameters['q'];
+                if (cityName != null) {
+                  getWeatherFromName(city: cityName);
+                  return _fadeTransition(
+                    context,
+                    state,
+                    (userName.getName() == null)
+                        ? firstStartUp()
+                        : NormalStartUpLoaderScreen(),
+                  );
+                }
+                return _fadeTransition(
+                    context, state, NormalStartUpLoaderScreen());
+              },
+            ),
             GoRoute(
               path: '/main',
               pageBuilder: (context, state) => _fadeTransition(
@@ -143,6 +190,12 @@ Future<void> main() async {
       ),
     ),
   );
+  await AndroidAlarmManager.initialize();
+  try {
+    await _cancelExistingAlarms();
+    await _scheduleAlarms();
+  } on Exception {}
+  await MobileAds.instance.initialize();
 }
 
 Future<void> _cancelExistingAlarms() async {
@@ -152,6 +205,7 @@ Future<void> _cancelExistingAlarms() async {
   await AndroidAlarmManager.cancel(3);
   await AndroidAlarmManager.cancel(4);
   await AndroidAlarmManager.cancel(5);
+  await AndroidAlarmManager.cancel(6);
 }
 
 Future<void> _scheduleAlarms() async {
@@ -227,6 +281,19 @@ Future<void> _scheduleAlarms() async {
     allowWhileIdle: true,
     startAt: calculateDurationFromSpecificTime(
       const TimeOfDay(hour: 16, minute: 30),
+    ),
+    exact: true,
+    rescheduleOnReboot: true,
+    wakeup: true,
+  );
+  // Widget Update Evening
+  await AndroidAlarmManager.periodic(
+    const Duration(days: 1),
+    6,
+    WidgetUpdate,
+    allowWhileIdle: true,
+    startAt: calculateDurationFromSpecificTime(
+      const TimeOfDay(hour: 18, minute: 00),
     ),
     exact: true,
     rescheduleOnReboot: true,
