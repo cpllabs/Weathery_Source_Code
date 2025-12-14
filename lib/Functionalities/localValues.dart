@@ -40,10 +40,10 @@ List<String> nightMessages = [
 ];
 
 List<String> shareMessages = [
-  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
-  "Check Out The Current Weather In %USERCITY, %USERCOUNTRY!\nPowered By Weathery @ https://play.google.com/store/apps/details?id=com.CPLLabs.weathery",
+  "Take A Look At The Weather Of %USERCITY, %USERCOUNTRY\nView Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
+  "Check Out The Current Weather In %USERCITY, %USERCOUNTRY!\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
   "Current Weather Conditions Of %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
-  "Current Weather At %USERCITY, %USERCOUNTRY\nCheck Here : https://aryanshdev.github.io/weathery/%LAT/%LONG",
+  "Current Weather At %USERCITY, %USERCOUNTRY\nCheck Out At : https://aryanshdev.github.io/weathery/%LAT/%LONG",
 ];
 
 class Greetings {

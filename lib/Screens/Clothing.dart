@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -46,10 +47,10 @@ class _ClothingScreenState extends State<ClothingScreen> {
               NativeTemplateTextStyle(textColor: Colors.grey, size: 12.0),
           tertiaryTextStyle:
               NativeTemplateTextStyle(textColor: Colors.grey, size: 10.0),
-          templateType: TemplateType.small,
+          templateType: TemplateType.medium,
           mainBackgroundColor: primaryForegroundColor,
           cornerRadius: 10),
-      adUnitId: ADMOB_APP_ID,
+      adUnitId: MEDIATED_UNIT_ID,
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(
@@ -59,13 +60,20 @@ class _ClothingScreenState extends State<ClothingScreen> {
             _isNativeLoaded = true;
           });
         },
-        onAdFailedToLoad: (ad, error) {
+        onAdFailedToLoad: (ad, error) async{
           ad.dispose();
           _nativeAd = null;
-          //  _loadNativeAd();
+          await Future.delayed(1.seconds);
+           _loadNativeAd();
         },
       ),
     )..load();
+  }
+
+  @override
+  void dispose() {
+    _nativeAd?.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,6 +82,7 @@ class _ClothingScreenState extends State<ClothingScreen> {
         temperature: widget.temp,
         currentDescription: widget.desc,
         uvIndex: (widget.uv)));
+
     return Scaffold(
       body: Container(
         margin: EdgeInsets.all(0),
@@ -325,10 +334,23 @@ class _ClothingScreenState extends State<ClothingScreen> {
                         ),
                       ),
                     ),
-                    _isNativeLoaded ? AdWidget(ad: _nativeAd!) : Container(),
                     SizedBox(
-                      height: 20,
-                    )
+                      height: 10,
+                    ),
+                  _isNativeLoaded
+                      ? Container(
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                        const BorderRadius.all(Radius.circular(10)),
+                        color: primaryForegroundColor,
+                      ),
+                      height: 355,
+                          child : AdWidget(ad: _nativeAd!))
+                        : SizedBox(
+                    height: 20,
+                  ),
                   ],
                 ),
               ),

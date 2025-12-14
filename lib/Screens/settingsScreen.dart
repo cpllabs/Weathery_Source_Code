@@ -4,6 +4,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -64,7 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
           templateType: TemplateType.small,
           mainBackgroundColor: primaryForegroundColor,
           cornerRadius: 10),
-      adUnitId: ADMOB_APP_ID,
+      adUnitId: MEDIATED_UNIT_ID,
       factoryId: 'listTile',
       request: const AdRequest(),
       listener: NativeAdListener(
@@ -74,9 +75,10 @@ class _SettingsPageState extends State<SettingsPage> {
             _isNativeLoaded = true;
           });
         },
-        onAdFailedToLoad: (ad, error) {
+        onAdFailedToLoad: (ad, error) async {
           ad.dispose();
           _nativeAd = null;
+          await Future.delayed(1.seconds);
           _loadNativeAd();
         },
       ),
@@ -186,23 +188,24 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
 
-            Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  color: primaryForegroundColor,
-                ),
-                margin: const EdgeInsets.only(
-                  top: 5,
-                ),
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(10)),
+                    color: primaryForegroundColor,
+                  ),
+                  margin: const EdgeInsets.only(
+                    top: 5,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: 2.5,
-                    children: [Text(
-                      "Notification Settings",
-                      style: headingStyle.copyWith(fontSize: 22),
-                      textAlign: TextAlign.left,
-                    ),
+                    children: [
+                      Text(
+                        "Notification Settings",
+                        style: headingStyle.copyWith(fontSize: 22),
+                        textAlign: TextAlign.left,
+                      ),
                       const SizedBox(
                         height: 5,
                       ),
@@ -337,7 +340,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           style: headingStyle.copyWith(fontSize: 22),
                           textAlign: TextAlign.left,
                         ),
-
                         Text(
                           "Make sure Alarms and Reminders setting is enabled, Goto App Info -> "
                           "Alarms and reminders -> Turn on Allow setting alarms and reminders"
@@ -347,29 +349,27 @@ class _SettingsPageState extends State<SettingsPage> {
                               fontSize: 18, fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
                         ),
-
                         showBatteryExempt
                             ? MaterialButton(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 15),
-                              shape: const ContinuousRectangleBorder(
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(10))),
-                              onPressed: () async {
-                                AppSettings.openAppSettings(
-                                  type: AppSettingsType.batteryOptimization,
-                                );
-                              },
-                              color: buttonColor,
-                              child: const Text(
-                                "Disable Battery Optimization",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            )
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                shape: const ContinuousRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                onPressed: () async {
+                                  AppSettings.openAppSettings(
+                                    type: AppSettingsType.batteryOptimization,
+                                  );
+                                },
+                                color: buttonColor,
+                                child: const Text(
+                                  "Disable Battery Optimization",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              )
                             : Container(),
-
                         MaterialButton(
                           padding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 15),
@@ -391,16 +391,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     )),
                 _isNativeLoaded
                     ? Container(
+                        decoration: BoxDecoration(
+                          color: primaryForegroundColor,
+                          borderRadius: BorderRadius.circular(10)
+                        ),
                         margin: EdgeInsets.only(top: 15, bottom: 15),
-                        color: primaryForegroundColor,
-                        width: double
-                            .infinity, // Native ads usually take full width
+                        padding: EdgeInsets.all(8),
+                        width: double.infinity,
                         height: 120,
-
                         child: AdWidget(ad: _nativeAd!),
                       )
                     : Container(
-                        height: 135,
+                        height: 30,
                       ),
               ],
             ),

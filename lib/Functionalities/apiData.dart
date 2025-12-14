@@ -185,9 +185,7 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
 
 getWeather({lat, long, defaultCall = false}) async {
   Map<String, dynamic> body = {};
-  print(lat+long);
   if (CacheManager.instance.getWeather('$lat;$long') != null) {
-    print(("SENDING CACHE"));
     await Future.delayed(1.seconds);
     body = CacheManager.instance.getWeather('$lat;$long')
         as Map<String, dynamic>;
@@ -296,6 +294,7 @@ void setData(var body, bool notFirstTime) async {
       uv: body["current"]["uv"].toString(),
       rainData: analyzeWeather(body),
       temp: body["current"]["temp_c"].toString(),
+      feelLikesTemp: body["current"]["feelslike_c"].toString(),
       desc: body["current"]["condition"]["text"],
       feels: body["current"]["feelslike_c"].toString(),
       pressure: body["current"]["pressure_mb"].toString(),
@@ -524,7 +523,6 @@ Future<void> MorningMessage() async {
 Future NoonMessage() async {
   var obj = NotificationSettings();
   await obj.initPrefObj();
-
   if (obj.getNoonSavedStatus()) {
     List weatherInfo =
         await BackGroundWeather(); //temp,rain or snow, desc,icon,no. of alerts
