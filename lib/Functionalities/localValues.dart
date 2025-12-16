@@ -234,13 +234,23 @@ class NotificationSettings {
 String analyzeWeather(Map<String, dynamic> body) {
   String out = "";
   List<List<int>> multiPurposeDescVar = [[], []];
+
   int currentHour = DateTime.now().hour;
-  for (int i = currentHour; i <= currentHour + 6; i++) {
-    multiPurposeDescVar[0]
-        .add(body["forecast"]['forecastday'][0]["hour"][i]["will_it_rain"]);
-    multiPurposeDescVar[1]
-        .add(body["forecast"]['forecastday'][0]["hour"][i]["will_it_snow"]);
+  for (int offset = 0; offset <= 6; offset++) {
+    int hourIndex = currentHour + offset;
+    int dayIndex = 0;
+
+    if (hourIndex > 23) {
+      hourIndex -= 24;
+      dayIndex = 1;
+    }
+
+    var hourData = body["forecast"]['forecastday'][dayIndex]["hour"][hourIndex];
+
+    multiPurposeDescVar[0].add(hourData["will_it_rain"]);
+    multiPurposeDescVar[1].add(hourData["will_it_snow"]);
   }
+
   bool multi = false;
   if (multiPurposeDescVar[0].contains(1)) {
     out = "Possibilities of Rain";
@@ -256,9 +266,18 @@ String analyzeWeather(Map<String, dynamic> body) {
 String analyzeTemperature(Map<String, dynamic> body) {
   List<double> multiPurposeDescVar = [];
   int currentHour = DateTime.now().hour;
-  for (int i = currentHour; i <= currentHour + 6; i++) {
-    multiPurposeDescVar
-        .add(body["forecast"]['forecastday'][0]["hour"][i]["temp_c"]);
+
+  for (int offset = 0; offset <= 6; offset++) {
+    int hourIndex = currentHour + offset;
+    int dayIndex = 0;
+    if (hourIndex > 23) {
+      hourIndex -= 24;
+      dayIndex = 1;
+    }
+
+    multiPurposeDescVar.add(
+        body["forecast"]['forecastday'][dayIndex]["hour"][hourIndex]["temp_c"]
+    );
   }
   return "Ranging From ${multiPurposeDescVar.reduce(min)}°C To ${multiPurposeDescVar.reduce(max)}°C";
 }

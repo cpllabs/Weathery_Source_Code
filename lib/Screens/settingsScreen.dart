@@ -153,35 +153,32 @@ class _SettingsPageState extends State<SettingsPage> {
                             fontSize: 18, color: Colors.white),
                         controller: nameInpController,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(125, 0, 125, 0),
-                        child: MaterialButton(
-                          shape: const ContinuousRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          onPressed: () {
-                            if (nameInpController.text.isNotEmpty) {
-                              usernameObj.setName(nameInpController.text);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(
-                                  "Name Updated Successfully",
-                                )),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Name Cannot Be Empty"),
-                                ),
-                              );
-                            }
-                          },
-                          color: buttonColor,
-                          child: const Text(
-                            "Save",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
+                      MaterialButton(
+                        shape: const ContinuousRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        onPressed: () {
+                          if (nameInpController.text.isNotEmpty) {
+                            usernameObj.setName(nameInpController.text);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                "Name Updated Successfully",
+                              )),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("Name Cannot Be Empty"),
+                              ),
+                            );
+                          }
+                        },
+                        color: buttonColor,
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
