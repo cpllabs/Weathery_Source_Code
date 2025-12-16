@@ -478,7 +478,7 @@ Future<List> BackGroundWeather() async {
   }
   Map<String, dynamic> body = {};
   Uri url = Uri.parse(
-      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$positionCord&aqi=yes&alerts=yes&days=1');
+      'https://api.weatherapi.com/v1/forecast.json?key=$WEATHERAPIKEY&q=$positionCord&aqi=yes&alerts=yes&days=2');
   var response;
   try {
     response = await http.get(url);
