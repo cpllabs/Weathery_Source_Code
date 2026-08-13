@@ -14,10 +14,10 @@ import 'package:home_widget/home_widget.dart';
 import 'package:icons_plus/icons_plus.dart';
 // import 'package:ironsource_mediation/ironsource_mediation.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weathery/APIKeys.dart';
 import 'package:weathery/Functionalities/DataProviders.dart';
 import 'package:weathery/Functionalities/apiData.dart';
+import 'package:weathery/Functionalities/permissionCoordinator.dart';
 import 'package:weathery/Functionalities/homeWidgetControl.dart';
 import 'package:weathery/semiWidgets.dart';
 import '../themeData.dart';
@@ -93,8 +93,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   void initState() {
-    __checkNoAdvisoryUser();
     _loadNativeAd();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        PermissionCoordinator.promptDeferredPermissions(context);
+      }
+    });
     super.initState();
   }
 
@@ -130,46 +134,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         },
       ),
     )..load();
-  }
-
-  void __checkNoAdvisoryUser() async {
-    SharedPreferencesAsync obj = SharedPreferencesAsync();
-    obj.getBool("NoAdvisory").then((data) {
-      if (data == null) {
-        _showAdvisoryDialog(_globalKey.currentContext!, obj);
-      }
-    });
-  }
-
-  void _showAdvisoryDialog(
-      BuildContext context, SharedPreferencesAsync sharedPrefObj) {
-    alertUser(
-      title: Text(
-        "Final Request",
-        style: headingStyle.copyWith(fontSize: 20),
-      ),
-      content: Text(
-        "Please Allow Battery Optimization Setting To Ensure Timely And Correct Delivery Of Notifications and Widget Updates!",
-        style: captionStyle.copyWith(fontSize: 18),
-      ),
-      actions: [
-        ElevatedButton(
-          onPressed: () async {
-            Navigator.pop(context);
-            context.go("/settings");
-            await sharedPrefObj.setBool("NoAdvisory", false);
-          },
-          child: const Text("Open Settings"),
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            Navigator.pop(context);
-            await sharedPrefObj.setBool("NoAdvisory", false);
-          },
-          child: const Text("Ignore :("),
-        ),
-      ],
-    );
   }
 
   Future<void> captureAndSaveImage() async {
