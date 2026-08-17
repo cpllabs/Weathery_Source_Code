@@ -105,13 +105,6 @@ class PermissionCoordinator {
               "Allow location access in the background so your home widget stays up to date.",
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                launchUrlString(
-                    'https://www.youtube.com/watch?v=oLOnlHOOxgU');
-              },
-              child: const Text("Know Why"),
-            ),
           ],
         ),
         actions: [
@@ -128,6 +121,15 @@ class PermissionCoordinator {
               await Permission.locationAlways.request();
             },
             child: const Text("Allow"),
+          ),
+          Container(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                launchUrlString('https://www.youtube.com/watch?v=oLOnlHOOxgU');
+              },
+              child: const Text("Know Why?"),
+            ),
           ),
         ],
       ),
@@ -210,18 +212,18 @@ class PermissionCoordinator {
             onPressed: () async {
               Navigator.pop(ctx);
               await prefs.setBool(_keyBattery, false);
-            },
-            child: const Text("Not now"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await prefs.setBool(_keyBattery, false);
               if (context.mounted) {
                 context.go("/settings");
               }
             },
             child: const Text("Open Settings"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await prefs.setBool(_keyBattery, false);
+            },
+            child: const Text("Not now"),
           ),
         ],
       ),

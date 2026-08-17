@@ -71,12 +71,12 @@ class PremiumDialog extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: secondaryForegroundColor,
+          color: primaryForegroundColor,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withOpacity(0.9),
               blurRadius: 30,
               offset: const Offset(0, 15),
             ),
@@ -96,7 +96,7 @@ class PremiumDialog extends StatelessWidget {
           children: [
             DefaultTextStyle(
               style: const TextStyle(
-                fontSize: 22,
+                fontSize: 19,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
                 letterSpacing: 0.5,
@@ -105,38 +105,37 @@ class PremiumDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             DefaultTextStyle(
-              style: captionStyle.copyWith(fontSize: 17, height: 1.4),
+              style: captionStyle.copyWith(fontSize: 16, height: 1.4),
               child: content,
             ),
             const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
               children: actions.map((action) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 12),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      elevatedButtonTheme: ElevatedButtonThemeData(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          backgroundColor:
-                              const Color(0xFF007AFF), // Vibrant blue
-                          foregroundColor: Colors.white,
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
-                          ),
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    elevatedButtonTheme: ElevatedButtonThemeData(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor:
+                            const Color(0xFF007AFF), // Vibrant blue
+                        foregroundColor: Colors.white,
+                        textStyle: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
-                    child: action,
                   ),
+                  child: action,
                 );
               }).toList(),
             ),
