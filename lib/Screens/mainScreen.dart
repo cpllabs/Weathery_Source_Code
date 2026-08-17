@@ -765,6 +765,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                       child: Image.asset(
                                         "assets/$icon",
                                         scale: 0.5,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Image.network(
+                                                  'https://cdn.weatherapi.com/$icon',
+                                                  scale: 0.5,
+                                                ),
                                       ),
                                     ),
                                   ],

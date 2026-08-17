@@ -26,15 +26,10 @@ void alertUser(
     barrierDismissible: false,
     context: globalNavigatorKey.currentContext!,
     builder: (BuildContext _) {
-      return AlertDialog(
+      return PremiumDialog(
         title: title,
-        titleTextStyle:
-            const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         content: content,
         actions: actions,
-        backgroundColor: secondaryForegroundColor,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
       );
     },
   );
@@ -47,19 +42,109 @@ void alertUserAsync(
   showDialog(
     context: globalNavigatorKey.currentContext!,
     builder: (BuildContext _) {
-      return AlertDialog(
+      return PremiumDialog(
         title: title,
-        titleTextStyle:
-            const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
         content: content,
         actions: actions,
-        actionsAlignment: MainAxisAlignment.center,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
-        backgroundColor: secondaryForegroundColor,
       );
     },
   );
+}
+
+class PremiumDialog extends StatelessWidget {
+  final Widget title;
+  final Widget content;
+  final List<Widget> actions;
+
+  const PremiumDialog({
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.actions,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: secondaryForegroundColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
+            ),
+          ],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              primaryForegroundColor,
+              secondaryForegroundColor,
+            ],
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DefaultTextStyle(
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
+              child: title,
+            ),
+            const SizedBox(height: 16),
+            DefaultTextStyle(
+              style: captionStyle.copyWith(fontSize: 17, height: 1.4),
+              child: content,
+            ),
+            const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: actions.map((action) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      elevatedButtonTheme: ElevatedButtonThemeData(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor:
+                              const Color(0xFF007AFF), // Vibrant blue
+                          foregroundColor: Colors.white,
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                    child: action,
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class RotationAnimation extends StatefulWidget {
@@ -155,7 +240,7 @@ class _SearchBarState extends State<SearchBar> {
             _isNativeAdLoaded = true;
           });
         },
-        onAdFailedToLoad: (ad, error) async{
+        onAdFailedToLoad: (ad, error) async {
           ad.dispose();
           _nativeAd = null;
           await Future.delayed(1.seconds);
@@ -388,16 +473,15 @@ class _SearchBarState extends State<SearchBar> {
                           ),
                           _isNativeAdLoaded
                               ? Container(
-                            margin: EdgeInsets.all(10),
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                              color: primaryForegroundColor,
-                            ),
-                            height: 355,
-
-                            child: AdWidget(ad: _nativeAd!),
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10)),
+                                    color: primaryForegroundColor,
+                                  ),
+                                  height: 355,
+                                  child: AdWidget(ad: _nativeAd!),
                                 )
                               : Container(),
                         ],
@@ -551,12 +635,9 @@ class _SideNavBarState extends State<SideNavBar> {
               height: 5,
             ),
             NavBarItem(Icons.privacy_tip_sharp, "Privacy Policy", () {
-              launchUrlString(
-                  "https://aryanshdev.in/privacy",
+              launchUrlString("https://aryanshdev.in/privacy",
                   mode: LaunchMode.externalApplication);
             }),
-
-
           ],
         ),
       ),
@@ -626,7 +707,9 @@ class ForecastDisplayObject extends StatelessWidget {
             time,
             textAlign: TextAlign.center,
           ),
-          Image.asset('assets/$icon'),
+          Image.asset('assets/$icon',
+              errorBuilder: (context, error, stackTrace) =>
+                  Image.network('https:$icon')),
           Text('$temp °C'),
           Text(
             desc,
