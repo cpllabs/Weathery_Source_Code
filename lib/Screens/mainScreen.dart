@@ -126,11 +126,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             _isNativeLoaded = true;
           });
         },
-        onAdFailedToLoad:  (ad, error) async{
+        onAdFailedToLoad: (ad, error) async {
           ad.dispose();
           _nativeAd = null;
           await Future.delayed(1.seconds);
-           _loadNativeAd();
+          _loadNativeAd();
         },
       ),
     )..load();
@@ -407,6 +407,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               child: Image.asset(
                                 "assets/$icon",
                                 scale: 0.65,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Image.network(
+                                  'https://cdn.weatherapi.com/$icon',
+                                  scale: 0.65,
+                                ),
                               ),
                             ),
                           ],
@@ -768,9 +773,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                         errorBuilder:
                                             (context, error, stackTrace) =>
                                                 Image.network(
-                                                  'https://cdn.weatherapi.com/$icon',
-                                                  scale: 0.5,
-                                                ),
+                                          'https://cdn.weatherapi.com/$icon',
+                                          scale: 0.5,
+                                        ),
                                       ),
                                     ),
                                   ],

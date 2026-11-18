@@ -1,17 +1,12 @@
 # Preserve Home Widget Plugin & Related Classes
 -keep class es.antonborri.home_widget.** { *; }
--keep class io.flutter.embedding.engine.** { *; }
 -keep class io.flutter.plugin.common.MethodChannel { *; }
 -keep class io.flutter.plugin.common.MethodCall { *; }
 
-# Keep Flutter & Kotlin Reflect Classes
--keep class kotlinx.** { *; }
--keep class kotlin.** { *; }
+# Note: kotlin/kotlinx/flutter-engine ship their own consumer rules; blanket
+# keeps here disabled obfuscation for thousands of classes (Play "DEX code
+# optimization" warning), so don't add them back.
 
-# Prevent Removal of XML & Resource Parsing Classes
--keep class org.xmlpull.** { *; }
--keep class org.kxml2.** { *; }
--keep class android.content.res.** { *; }
 # Preserve resource classes
 -keep class **.R$* {
     public static final int *;
@@ -37,6 +32,11 @@
 -dontwarn com.facebook.ads.internal.**
 -keep class com.facebook.ads.** { *; }
 -keep class com.facebook.infer.** { *; }
+
+# OkHttp optional TLS providers (not bundled; OkHttp checks for them at runtime)
+-dontwarn org.bouncycastle.jsse.**
+-dontwarn org.conscrypt.**
+-dontwarn org.openjsse.**
 
 # Prevent ProGuard from Obfuscating Method Signatures
 -keepattributes *Annotation*
