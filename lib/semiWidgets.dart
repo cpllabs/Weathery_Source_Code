@@ -708,7 +708,7 @@ class ForecastDisplayObject extends StatelessWidget {
           ),
           Image.asset('assets/$icon',
               errorBuilder: (context, error, stackTrace) =>
-                  Image.network('https:$icon')),
+                  Image.network('https://cdn.weatherapi.com/$icon')),
           Text('$temp °C'),
           Text(
             desc,
