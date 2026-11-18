@@ -3,12 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weathery/APIKeys.dart';
 import 'package:weathery/Functionalities/CacheManager.dart';
@@ -26,19 +24,33 @@ import 'homeWidgetControl.dart';
 
 var providerCon = ProviderContainer();
 
+Future<void> _fetchLocationAndWeather({defaultCall = false}) async {
+  Position position = await Geolocator.getCurrentPosition(
+      locationSettings: AndroidSettings(accuracy: LocationAccuracy.medium));
+
+  double lat = position.latitude;
+  double long = position.longitude;
+
+  var locationObj = Location();
+  await locationObj.initPrefObj();
+  locationObj.setLoaction(lat, long);
+  getWeather(lat: lat, long: long, defaultCall: defaultCall);
+}
+
 Future<void> getCurrentLocation({defaultCallCheck = false}) async {
   bool result = await InternetConnectionChecker.instance.hasConnection;
   if (result == false) {
     showInternetConnectionWarning();
     return;
   }
-  LocationPermission permission;
-  permission = await Geolocator.checkPermission();
+
+  LocationPermission permission = await Geolocator.checkPermission();
+
   if (permission == LocationPermission.deniedForever) {
     alertUser(
       title: const Text("Location Access Required"),
       content: const Text(
-          "Location access is required in order to get precise weather details, As you selected \"Never\", You need to enable permission in Settings manually."),
+          "Location access is required in order to get precise weather details. As you selected \"Never\", you need to enable permission in Settings manually."),
       actions: [
         ElevatedButton(
           onPressed: () {
@@ -53,11 +65,14 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
             child: const Text("Quit"))
       ],
     );
-  } else if (permission != LocationPermission.always) {
+    return;
+  }
+
+  if (permission == LocationPermission.denied) {
     alertUserAsync(
-      title: const Text("Location And Alarm Access Required"),
+      title: const Text("Location Access Required"),
       content: Text(
-        "Location access is required in order to get precise weather details.\nPlease Select Allow Always For Location and Allow Alarm And Reminder Settings So That Location Can Be Used In Background To Update The Widget!",
+        "Location access is required to show weather for your area.",
         style: captionStyle.copyWith(fontSize: 18),
       ),
       actions: [
@@ -65,122 +80,23 @@ Future<void> getCurrentLocation({defaultCallCheck = false}) async {
           onPressed: () async {
             await Geolocator.requestPermission();
             permission = await Geolocator.checkPermission();
-            if (permission != LocationPermission.always) {
-              Navigator.of(globalNavigatorKey.currentContext!,
-                      rootNavigator: true)
-                  .pop();
-              await Permission.locationAlways.request();
-              await Permission.scheduleExactAlarm.request();
-              Position position = await Geolocator.getCurrentPosition(
-                  locationSettings:
-                      AndroidSettings(accuracy: LocationAccuracy.medium));
-              double lat = position.latitude;
-              double long = position.longitude;
-
-              FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-                  FlutterLocalNotificationsPlugin();
-              flutterLocalNotificationsPlugin
-                  .resolvePlatformSpecificImplementation<
-                      AndroidFlutterLocalNotificationsPlugin>()
-                  ?.requestNotificationsPermission();
-
-              var locationObj = Location();
-              await locationObj.initPrefObj();
-              locationObj.setLoaction(lat, long);
-              getWeather(lat: lat, long: long);
+            if (permission == LocationPermission.denied ||
+                permission == LocationPermission.deniedForever) {
+              return;
             }
+            Navigator.of(globalNavigatorKey.currentContext!,
+                    rootNavigator: true)
+                .pop();
+            await _fetchLocationAndWeather(defaultCall: defaultCallCheck);
           },
           child: const Text("Allow"),
         ),
       ],
     );
-  } else {
-    if (!(await Permission.scheduleExactAlarm.isGranted)) {
-      alertUserAsync(
-        title: const Text(
-            "Schedule Exact Alarm Required For Notifications and Widget"),
-        content: Text(
-          "Schedule Exact Alarm Setting is required in order to get precise weather details in background to update widget and send update notifications!",
-          style: captionStyle.copyWith(fontSize: 18),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () async {
-              await Permission.scheduleExactAlarm.request();
-              if (await Permission.scheduleExactAlarm.isGranted) {
-                Navigator.of(globalNavigatorKey.currentContext!,
-                        rootNavigator: true)
-                    .pop();
-              }
-              FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-                  FlutterLocalNotificationsPlugin();
-              flutterLocalNotificationsPlugin
-                  .resolvePlatformSpecificImplementation<
-                      AndroidFlutterLocalNotificationsPlugin>()
-                  ?.requestNotificationsPermission();
-
-              Position position = await Geolocator.getCurrentPosition(
-                  locationSettings:
-                      AndroidSettings(accuracy: LocationAccuracy.medium));
-
-              double lat = position.latitude;
-              double long = position.longitude;
-
-              var locationObj = Location();
-              await locationObj.initPrefObj();
-              locationObj.setLoaction(lat, long);
-              getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
-            },
-            child: const Text("Allow"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.of(globalNavigatorKey.currentContext!,
-                      rootNavigator: true)
-                  .pop();
-              FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-                  FlutterLocalNotificationsPlugin();
-              flutterLocalNotificationsPlugin
-                  .resolvePlatformSpecificImplementation<
-                      AndroidFlutterLocalNotificationsPlugin>()
-                  ?.requestNotificationsPermission();
-
-              Position position = await Geolocator.getCurrentPosition(
-                  locationSettings:
-                      AndroidSettings(accuracy: LocationAccuracy.medium));
-
-              double lat = position.latitude;
-              double long = position.longitude;
-
-              var locationObj = Location();
-              await locationObj.initPrefObj();
-              locationObj.setLoaction(lat, long);
-              getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
-            },
-            child: const Text("Ignore :("),
-          ),
-        ],
-      );
-    } else {
-      FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-          FlutterLocalNotificationsPlugin();
-      flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.requestNotificationsPermission();
-
-      Position position = await Geolocator.getCurrentPosition(
-          locationSettings: AndroidSettings(accuracy: LocationAccuracy.medium));
-
-      double lat = position.latitude;
-      double long = position.longitude;
-
-      var locationObj = Location();
-      await locationObj.initPrefObj();
-      locationObj.setLoaction(lat, long);
-      getWeather(lat: lat, long: long, defaultCall: defaultCallCheck);
-    }
+    return;
   }
+
+  await _fetchLocationAndWeather(defaultCall: defaultCallCheck);
 }
 
 getWeather({lat, long, defaultCall = false}) async {
